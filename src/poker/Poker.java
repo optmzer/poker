@@ -18,7 +18,8 @@ public class Poker {
     public static void main(String[] args) {
         
         int user_input;
-        
+        Deck deck1 = new Deck();
+
         //this type of try block auto closes resource.
         try ( Scanner scan = new Scanner(System.in)) {
             do{
@@ -33,6 +34,8 @@ public class Poker {
                 switch(user_input){
                     case 1:
                         System.out.println("Play Game");
+                        System.out.println("Deck = " + deck1.dialHand());
+                                        
                         return;
                     case 2:
                         System.out.println("Program Exit");
