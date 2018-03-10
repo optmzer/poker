@@ -23,11 +23,11 @@ public class Deck {
     public Deck(){
         //List of Spades
         Enum[] spades = Spades.class.getEnumConstants();
-    //List of Diamonds
+        //List of Diamonds
         Enum[] diamonds = Diamonds.class.getEnumConstants();
-    //List of Hearts.
+        //List of Hearts.
         Enum[] hearts = Hearts.class.getEnumConstants();
-    //List of Clubs
+        //List of Clubs
         Enum[] clubs = Clubs.class.getEnumConstants();
 
         this.deck.addAll(Arrays.asList(spades));
@@ -53,9 +53,9 @@ public class Deck {
         for(int i = 0; i < 5; ++i){
             hand.add(this.deck.get(0));
             this.deck.remove(0);
-            System.out.println("L55 Hand = " + hand.get(i).getClass());
+//            System.out.println("L55 Hand = " + hand.get(i).getClass());
         }
-        System.out.println("L58 Hand = " + hand);
+//        System.out.println("L58 Hand = " + hand);
         
         Collections.sort(hand, new Comparator<Enum>(){
             @Override
