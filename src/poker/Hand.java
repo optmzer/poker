@@ -24,18 +24,35 @@ public class Hand {
     
     public Hand(List<Enum> hand){
         if(hand.size() == 5){
+            this.sortHand(hand);
             this.hand = hand ;
             this.determineHandType();
         }
     }
     
     //Getters - Setters
+    public Enum getHandType(){
+        return this.handType;
+    }
+    
     
     //Replace a card by index
     
     //compare Hand to another hand
     
     //TODO: What to do with the money if hands are equal in Rank?
+    
+    public final void sortHand(List<Enum> hand){
+        
+        Collections.sort(hand, new Comparator<Enum>(){
+            @Override
+            public int compare(Enum o1, Enum o2){
+                return o1.ordinal() - o2.ordinal();
+            }
+        });
+        
+        Collections.reverse(hand);
+    }
     
     /**
      * Hand Rank = 5

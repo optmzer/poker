@@ -12,14 +12,16 @@ package poker;
 public class Player {
     private int wager = 0;
     private Hand hand = null;
+    private Enum player_type = null;
     
-    public Player(int wager, Hand hand){
+    public Player(int wager, Hand hand, Enum player_type){
         this.wager = wager;
         this.hand = hand;
+        this.player_type = player_type;
     }
     
-    public Player(Hand hand){
-        this(500, hand);
+    public Player(Hand hand, Enum player_type){
+        this(500, hand, player_type);
     }
     
     public void setWager(int wager){
@@ -82,5 +84,9 @@ public class Player {
         String output = "Hand: " + this.hand + "\n";
         output += "Wager: " + this.wager + "\n";
         return output;
+    }
+
+    public Enum getType() {
+        return this.player_type;
     }
 }//class

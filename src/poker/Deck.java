@@ -56,15 +56,6 @@ public class Deck {
 //            System.out.println("L55 Hand = " + hand.get(i).getClass());
         }
 //        System.out.println("L58 Hand = " + hand);
-        
-        Collections.sort(hand, new Comparator<Enum>(){
-            @Override
-            public int compare(Enum o1, Enum o2){
-                return o1.ordinal() - o2.ordinal();
-            }
-        });
-        
-        Collections.reverse(hand);
         return (new Hand(hand));
     }
     

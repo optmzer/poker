@@ -37,9 +37,10 @@ public class Poker {
                 
                 switch(user_input){
                     case 1:
-                                                System.out.println("Play Game");
-                        System.out.println("L37 Poker: Player 1 = " + bank.getPlayer(1).getHand());
-                                        
+                        System.out.println("Play Game");
+                        System.out.println("L41 Poker: "+ bank.getPlayer(0).getType() + " " + bank.getPlayer(0).getHand());
+                        System.out.println("L42 Poker: "+ bank.getPlayer(1).getType() + " " +  bank.getPlayer(1).getHand());
+                        System.out.println("L43 Poker: The winner is: " + bank.getWinner().getType() + " with " + bank.getWinner().getHand().getHandType());          
                         return;
                     case 2:
                         System.out.println("Continue Saved Game");
