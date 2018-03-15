@@ -9,18 +9,9 @@ package poker;
  *
  * @author Alexander Frolov
  */
-public enum Hearts{
-    TWO_HEARTS,
-    THREE_HEARTS,
-    FOUR_HEARTS,
-    FIVE_HEARTS,
-    SIX_HEARTS,
-    SEVEN_HEARTS,
-    EIGHT_HEARTS,
-    NINE_HEARTS,
-    TEN_HEARTS,
-    JACK_HEARTS,
-    QUEEN_HEARTS,
-    KING_HEARTS,
-    ACE_HEARTS;
+public enum CardSuit {
+    DIAMOND,
+    HEARTS,
+    SPADES,
+    CLUBS;
 }

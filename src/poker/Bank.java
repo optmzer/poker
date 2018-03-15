@@ -43,7 +43,7 @@ public class Bank {
     }
     
     public Enum getPlayerType(int index){
-        return this.players.get(index).getType();
+        return this.players.get(index).getPlayerType();
     }
     
     
@@ -53,19 +53,47 @@ public class Bank {
      * one pair and one pair. which is higher.
      * @return 
      */
-    public Player getWinner(){
+    public List<Player> getWinner(){
+        List<Player> winning_list = new ArrayList<>();
+        Collections.sort(
+            players, (Player player1, Player player2) -> 
+                player1.getHand().getHandType().ordinal() - player2.getHand().getHandType().ordinal()
+        );
         
-        Collections.sort(players, new Comparator<Player>(){
-            @Override
-            public int compare(Player player1, Player player2){
-                return player1.getType().ordinal() - player2.getType().ordinal();
+        /**
+         * By this time the player with winning hand should be
+         * at the beginning of the array.
+         */
+        
+        if(this.getPlayer(0).getHand().getHandType() == this.getPlayer(1).getHand().getHandType()){
+            int handType = this.getPlayer(0).getHand().getHandType().ordinal();
+            //there are 2 players with the same hand
+            //check which hand is higher
+            switch(handType){
+                default:
+                //Fall through - HandType.STRIGHT_FLUSH value = 1
+                //Fall through - HandType.FLUSH         value = 4
+                //Fall through - HandType.STRIGHT       value = 5
+                //Fall through - HandType.HIGH_CARD     value = 9
+                    
             }
-        });
-        
-        Collections.reverse(players);
+            //hands are equal = 2 winners
+            winning_list.add(this.getPlayer(0));
+            winning_list.add(this.getPlayer(1));
+//            Collections.sort(winning_list, new Comparator<Player>(){
+//            @Override
+//            public int compare(Player player1, Player player2){
+//                return player1.getHand(). - player2.getType().ordinal();
+//            }
+//        });
+            System.out.println("L74 Bank - there are 2 winners");
+        }else {
+            //there is one definite winner.
+            winning_list.add(this.getPlayer(0));
+            System.out.println("L78 Bank - there is 1 winner" + winning_list.get(0));
 
-
-        return this.getPlayer(0);
+        }
+        return winning_list;
     }
     
 }//class

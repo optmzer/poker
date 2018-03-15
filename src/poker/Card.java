@@ -10,25 +10,25 @@ package poker;
  * @author Alexander Frolov
  */
 public class Card implements Comparable<Card>{
-    private Diamonds card_suit;
-    private Spades card_rank;
+    private Enum card_suit;
+    private Enum card_rank;
     
-    public Card(Diamonds card_suit, Spades card_rank){
+    public Card(Enum card_suit, Enum card_rank){
         this.card_suit = card_suit;
         this.card_rank = card_rank;
     }
     
-    public Diamonds getSuit(){
+    public Enum getSuit(){
         return this.card_suit;
     }
-    public void setSuit(Diamonds card_suit){
+    public void setSuit(Enum card_suit){
         this.card_suit = card_suit;
     }
     
-    public Spades getRank(){
+    public Enum getRank(){
         return this.card_rank;
     }
-    public void setRank(Spades card_rank){
+    public void setRank(Enum card_rank){
         this.card_rank = card_rank;
     }
     
@@ -82,7 +82,7 @@ public class Card implements Comparable<Card>{
      */
     @Override
     public int compareTo(Card other_card) {
-    return this.getRank().compareTo(other_card.getRank());
+        return this.getRank().compareTo(other_card.getRank());
     }
     
     @Override

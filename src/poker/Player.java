@@ -5,6 +5,9 @@
  */
 package poker;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  *
  * @author Alexander Frolov
@@ -86,7 +89,7 @@ public class Player {
         return output;
     }
 
-    public Enum getType() {
+    public Enum getPlayerType() {
         return this.player_type;
     }
 }//class

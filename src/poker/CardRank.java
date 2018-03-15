@@ -9,18 +9,18 @@ package poker;
  *
  * @author Alexander Frolov
  */
-public enum Clubs {
-    TWO_CLUBS,
-    THREE_CLUBS,
-    FOUR_CLUBS,
-    FIVE_CLUBS,
-    SIX_CLUBS,
-    SEVEN_CLUBS,
-    EIGHT_CLUBS,
-    NINE_CLUBS,
-    TEN_CLUBS,
-    JACK_CLUBS,
-    QUEEN_CLUBS,
-    KING_CLUBS,
-    ACE_CLUBS;
+public enum CardRank {
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT,
+    NINE,
+    TEN,
+    JACK,
+    QUEEN,
+    KING,
+    ACE;
 }

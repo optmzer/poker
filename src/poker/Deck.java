@@ -6,9 +6,7 @@
 package poker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,23 +16,17 @@ import java.util.List;
  */
 public class Deck {
     //Create array of Cards.
-    private final List<Enum> deck = new ArrayList<>();
+    private final List<Card> deck = new ArrayList<>();
     
     public Deck(){
-        //List of Spades
-        Enum[] spades = Spades.class.getEnumConstants();
-        //List of Diamonds
-        Enum[] diamonds = Diamonds.class.getEnumConstants();
-        //List of Hearts.
-        Enum[] hearts = Hearts.class.getEnumConstants();
-        //List of Clubs
-        Enum[] clubs = Clubs.class.getEnumConstants();
 
-        this.deck.addAll(Arrays.asList(spades));
-        this.deck.addAll(Arrays.asList(diamonds));
-        this.deck.addAll(Arrays.asList(hearts));
-        this.deck.addAll(Arrays.asList(clubs));
-        
+        //Populate the Deck with 52 cards in sequence
+        for(Enum suit : CardSuit.values()){
+            for(Enum rank : CardRank.values()){
+                this.deck.add(new Card(suit, rank));
+            }
+        }
+//      Every day I'm shuffling - Shuffle the Deck
         this.shuffleCards();
     }//constructor
     
@@ -49,7 +41,7 @@ public class Deck {
      * @return 
      */
     public Hand dialHand(){
-        ArrayList<Enum> hand = new ArrayList<>();
+        ArrayList<Card> hand = new ArrayList<>();
         for(int i = 0; i < 5; ++i){
             hand.add(this.deck.get(0));
             this.deck.remove(0);

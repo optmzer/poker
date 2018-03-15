@@ -4,6 +4,7 @@
 package poker;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -30,7 +31,6 @@ public class Poker {
                 System.out.println("Press (2) to Saved Game");
                 System.out.println("Press (3) to Exit");
 
-                
                 System.out.print("> ");//Prompt.
 
                 user_input = scan.nextInt();
@@ -38,9 +38,17 @@ public class Poker {
                 switch(user_input){
                     case 1:
                         System.out.println("Play Game");
-                        System.out.println("L41 Poker: "+ bank.getPlayer(0).getType() + " " + bank.getPlayer(0).getHand());
-                        System.out.println("L42 Poker: "+ bank.getPlayer(1).getType() + " " +  bank.getPlayer(1).getHand());
-                        System.out.println("L43 Poker: The winner is: " + bank.getWinner().getType() + " with " + bank.getWinner().getHand().getHandType());          
+                        System.out.println("L41 Poker: "+ bank.getPlayer(0).getPlayerType() + " " + bank.getPlayer(0).getHand());
+                        System.out.println("L42 Poker: "+ bank.getPlayer(1).getPlayerType() + " " + bank.getPlayer(1).getHand());
+                            List<Player> winners = bank.getWinner();
+                        if(winners.size() > 1){
+                            //there are 2 winners
+                            System.out.println("L45 It is split :");
+                            System.out.println("L46 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
+                            System.out.println("L47 Poker: The winner is: " + winners.get(1).getPlayerType() + " with " + winners.get(1).getHand().getHandType());          
+                        }else{
+                            System.out.println("L49 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
+                        }
                         return;
                     case 2:
                         System.out.println("Continue Saved Game");

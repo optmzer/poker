@@ -8,21 +8,29 @@
  */
 package poker;
 
+    //TODO:
+    //Replace a card by index
+    
+    //compare Hand to another hand
+    
+    //TODO: What to do with the money if hands are equal in Rank?
+    //Move the organized cards to the left 
+
 import java.util.*;
 
 /**
  *
  * @author Alexander Frolov
  */
-public class Hand {
+public class Hand implements Comparable<Hand>{
     
     //compute stright away hand tipe 
     //and the way to compare to another hand which is higher.
     
-    private List<Enum> hand; 
+    private List<Card> hand; 
     private Enum handType;
     
-    public Hand(List<Enum> hand){
+    public Hand(List<Card> hand){
         if(hand.size() == 5){
             this.sortHand(hand);
             this.hand = hand ;
@@ -36,21 +44,24 @@ public class Hand {
     }
     
     
-    //Replace a card by index
     
-    //compare Hand to another hand
-    
-    //TODO: What to do with the money if hands are equal in Rank?
-    
-    public final void sortHand(List<Enum> hand){
+    /**
+     * Sorts given Hand by card Rank.
+     * @param hand 
+     */
+    public final void sortHand(List<Card> hand){
         
-        Collections.sort(hand, new Comparator<Enum>(){
-            @Override
-            public int compare(Enum o1, Enum o2){
-                return o1.ordinal() - o2.ordinal();
-            }
-        });
-        
+//        Collections.sort(hand, new Comparator<Card>(){
+//            @Override
+//            public int compare(Card card1, Card card2){
+//                    return card1.compareTo(card2);
+//            }
+//        });
+
+//      Collections.sort(hand, Card::compareTo); //Using member reference
+
+        Collections.sort(hand, (Card card1, Card card2) -> card1.compareTo(card2)); //Lambda expression
+
         Collections.reverse(hand);
     }
     
@@ -66,7 +77,7 @@ public class Hand {
         int counter = 0;
         if(hand.size() == 5){
             for(int i = 0; i < hand.size() - 1; ++i){
-                if(hand.get(i).ordinal() - hand.get(i + 1).ordinal() == 1){
+                if(hand.get(i).getRank().ordinal() - hand.get(i + 1).getRank().ordinal() == 1){
                     ++counter;
                 }
             }
@@ -81,18 +92,15 @@ public class Hand {
         String keySuit;
         Collection handMapRanks;
         Collection handMapSuits;
-        
-        Iterator handIter = this.hand.iterator();
-//        int value = 1;
-//        System.out.println("L135 Hand = " + this.hand);
-        
+       
         /**
          * Creates a Map with key = Card Rank, value - number of repetitions
+         * keyRank = rank of the card
+         * keySuit = suit of the card
          */
-        while(handIter.hasNext()){
-            String[] tokens = handIter.next().toString().split("_");
-            keyRank = tokens[0];
-            keySuit = tokens[1];
+        for (Card nextCard : this.hand) {
+            keyRank = nextCard.getRank().toString();
+            keySuit = nextCard.getSuit().toString();
             //Fill in Rank Map
             if(rankMap.containsKey(keyRank)){
                 int value = 1 + (int)rankMap.get(keyRank);
@@ -107,16 +115,12 @@ public class Hand {
             }else{
                 suitMap.put(keySuit, 1);
             }
-        }//while
-        
-        //Prints out set and values of the hand
-//        suitMap.keySet().forEach((key) -> {
-//            System.out.println("L117 Hand: suitMap = " + key + " " + suitMap.get(key));
-//        });
+        }
         
         handMapRanks = rankMap.values();
         handMapSuits = suitMap.values();
-        
+// =============== SORT BY HIGHEST PAIR =================
+
         if(handMapRanks.contains(4)){
             /**
             * Hand Rank = 2, 
@@ -124,6 +128,19 @@ public class Hand {
             * 5,5,5,5,7
             */
             this.handType = HandType.FOUR_OF_A_KIND;
+            
+            rankMap.keySet().forEach( (Object key) -> {
+                //Determine which rank makes 4 of a kind
+                if((int)rankMap.get(key) == 4){    
+                    //put cards making up a hand with this key first
+                    
+                }else{
+                    //use next key to organize cards
+                    
+                }
+            });
+            
+            
         }else if(handMapRanks.contains(3)){
             //check if there is 3 and 2
             if(handMapRanks.contains(3) && handMapRanks.contains(2)){
@@ -157,6 +174,7 @@ public class Hand {
                 * J,J,8,7,2 (2 + 1 + 1 + 1)
                 */
                 this.handType = HandType.ONE_PAIR;
+// =============== SORT BY HIGHEST PAIR =================
             }
         }else if(this.isStright()){
             /**
@@ -165,6 +183,8 @@ public class Hand {
             * 10,9,8,7,6
             */
             this.handType = HandType.STRIGHT;
+            //sort by highest card
+
         }else if(Collections.frequency(handMapSuits, 5) == 1){
             /**
             * Hand Rank = 4
@@ -172,6 +192,8 @@ public class Hand {
             * How to determine which Flush is the strongest?
             */
             this.handType = HandType.FLUSH;
+            //sort by highest card
+
         }else if(Collections.frequency(handMapSuits, 5) == 1 && this.isStright()){
             /**
             * Hand Rank = 1 - Highest 
@@ -179,6 +201,8 @@ public class Hand {
             * A,K,Q,J,10 - all of the same suit.
             */
             this.handType = HandType.STRIGHT_FLUSH;
+            //sort by highest card
+
         }else{
             /**
              * Hand Rank = 9 - High card - DEFAULT VALUE
@@ -186,10 +210,14 @@ public class Hand {
              * do not need this method as any hand that is not hand above is a high hand
              */
             handType = HandType.HIGH_CARD;
+            //sort by highest card
         }
     }//determineHandType()
     
-    
+    public void compareHandByCardRank(List<Card> hand){
+        Collections.sort(hand, Card::compareTo);
+    }
+     
     /**
      * @return 
      */
@@ -201,6 +229,11 @@ public class Hand {
             output += " " + handIt.next();
         }
         return output;
+    }
+
+    @Override
+    public int compareTo(Hand o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }//class
