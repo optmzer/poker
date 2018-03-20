@@ -4,14 +4,15 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Player.java</file>
+            <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/CardGroupType.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Deck.java</file>
-            <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/CardSuit.java</file>
+            <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/CardGroup.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Card.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Hand.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/PlayerType.java</file>
-            <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/CardRank.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Poker.java</file>
             <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/Bank.java</file>
+            <file>file:/C:/Users/Alexander%20Frolov/Documents/NetBeansProjects/Poker/src/poker/HandType.java</file>
         </group>
     </open-files>
 </project-private>

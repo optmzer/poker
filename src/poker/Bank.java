@@ -15,7 +15,9 @@ public class Bank {
     private int num_of_players = 0;
     private final List<Player> players = new ArrayList<>();
     private Deck deck;
-    private List<Player> winning_list = new ArrayList<>();
+    private final List<Player> winning_list = new ArrayList<>();
+    
+
     
 //    ========  CONSTRUCTORS 
     
@@ -47,7 +49,6 @@ public class Bank {
         return this.players.get(index).getPlayerType();
     }
     
-    
     /**
      * TODO: It works when hands are different
      * need to add evaluation of the same hand types.
@@ -70,52 +71,63 @@ public class Bank {
             int handType = this.getPlayer(0).getHand().getHandType().ordinal();
             Player possible_winner_1 = this.getPlayer(0);
             Player possible_winner_2 = this.getPlayer(1);
-            //there are 2 players with the same hand
-            //check which hand is higher
-            //For Strights and Flashes compare cards one by one
-            //For the rest sort by the highest pair and then compare cards one by one.
+            Hand player0_hand = possible_winner_1.getHand();
+            Hand player1_hand = possible_winner_2.getHand();
+            /**there are 2 players with the same hand
+            * check which hand is higher
+            * For straight hands and flashes compare cards one by one
+            * For the rest sort by the highest pair and then compare cards one by one.
+            */ 
             switch(handType){
                 case 2: //Fall through HandType.FOUR_OF_A_KIND 
+                    System.out.println("\nL84 Bank - FOUR_OF_A_KIND");
+                    this.sortHandByPairs(player0_hand, 4);
+                    this.sortHandByPairs(player1_hand, 4);
+                    break;
                 case 3: //Fall through HandType.FULL_HOUSE
                 case 6: //Fall through HandType.THREE_OF_A_KIND
+                    System.out.println("\nL90 Bank - FULL_HOUSE or THREE_OF_A_KIND");
+                    this.sortHandByPairs(player0_hand, 3);
+                    this.sortHandByPairs(player1_hand, 3);
+                    break;
                 case 7: //Fall through HandType.TWO_PAIRS
                 case 8: //Fall through HandType.ONE_PAIR
-                    System.out.println("L82 Bank - Pairs case");
+                    System.out.println("\nL82 Bank - TWO_PAIRS or ONE_PAIR");
+                    this.sortHandByPairs(player0_hand, 2);
+                    this.sortHandByPairs(player1_hand, 2);
+                    //Sort Player hand by a group of cards.
+                    //How many groups
+                    
+                    //Highest card wins
                     break;
                 default:
-                System.out.println("L85 Bank - Entered Default case");
                 //Fall through - HandType.STRIGHT_FLUSH value = 1
                 //Fall through - HandType.FLUSH         value = 4
                 //Fall through - HandType.STRIGHT       value = 5
                 //Fall through - HandType.HIGH_CARD     value = 9
-                
-                compareHandsByCard();
-                
-                //if winner list is stil empty = 2 winners
             }//switch(handType)
+                
+            //As hands already sorted I only need one method to determin 
+            //the highest hand.
+            compareHandsByCard();
             
+            //if winner list is stil empty = 2 winners
             if(winning_list.isEmpty()){
                 System.out.println("L99 Bank - there are 2 winners");
                 winning_list.add(this.getPlayer(0));
                 winning_list.add(this.getPlayer(1));    
             }
-            
-            //hands are equal = 2 winners
-//            Collections.sort(winning_list, new Comparator<Player>(){
-//            @Override
-//            public int compare(Player player1, Player player2){
-//                return player1.getHand(). - player2.getType().ordinal();
-//            }
-//        });
         }else {
             //there is one definite winner.
             winning_list.add(this.getPlayer(0));
             System.out.println("L78 Bank - there is 1 winner" + winning_list.get(0));
-
         }
         return winning_list;
     }//getWinner()
     
+    /**
+     * 
+     */
     private void compareHandsByCard (){
         for(Card card: this.getPlayer(0).getHand()){
             Card other_card = this.getPlayer(1).getHand().next();
@@ -134,5 +146,52 @@ public class Bank {
             System.out.println("Comparing cards " + card + " Player 1 = " + other_card + " result " + card.compareTo(other_card));
         }//
     }//compareHandsByCard()
+    
+    private void sortHandByPairs(Hand hand, int first_pair){
+        //TODO:
+        /**
+         * for 2 pairs and one pair need to check the highest pair within the
+         * hand.
+         */
+        if(first_pair == 2 && hand.getHandType() == HandType.TWO_PAIRS){
+            Card temp_card;
+            //Determin which pair is higher
+            /**
+             * Because by this time the hand is already sorted, the 
+             * highest pair will be the first in the handMap().
+             */
+            //Sort by highest pair
+            Set handKeySet = hand.getHandMap().keySet();
+            List<String> keys = new ArrayList<>(handKeySet);
+                //sort hand in reverse
+                for(int reverse_index = handKeySet.size() - 1; reverse_index >= 0; --reverse_index){
+                    if ((int) hand.getHandMap().get(keys.get(reverse_index)) == first_pair) {
+                    //put cards making up a hand with this key first
+                    for(int i = 0; i < 5; ++i){
+                        if(hand.getCard(i).getRank().toString().equalsIgnoreCase(keys.get(reverse_index))){
+                            temp_card = hand.getCard(i);
+                            hand.removeCard(i);
+                            hand.addCard(0, temp_card);
+                        }
+                    }
+                } 
+            }
+        }
+        //This will work for 4 of a kind and 3 of a kind, as well as full house.
+        hand.getHandMap().keySet().forEach((Object key) -> {
+            Card temp_card;
+            //Determine which rank makes 4 of a kind
+            if ((int) hand.getHandMap().get(key) == first_pair) {
+                //put cards making up a hand with this key first
+                for(int i = 0; i < 5; ++i){
+                    if(hand.getCard(i).getRank().toString() == key){
+                        temp_card = hand.getCard(i);
+                        hand.removeCard(i);
+                        hand.addCard(0, temp_card);
+                    }
+                }
+            } 
+        });
+    }//sortHandByPairs()
     
 }//class

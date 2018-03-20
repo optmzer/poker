@@ -9,10 +9,6 @@
 package poker;
 
 //TODO:
-//Replace a card by index
-//compare Hand to another hand
-//TODO: What to do with the money if hands are equal in Rank?
-//Move the organized cards to the left 
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -22,11 +18,10 @@ import java.util.function.Consumer;
  */
 public class Hand implements Iterator<Card>, Iterable<Card> {
 
-    //compute stright away hand tipe 
-    //and the way to compare to another hand which is higher.
     private List<Card> hand;
     private Enum handType;
-
+    private Map handMap;
+    
     private int card_counter = 0;
 
     public Hand(List<Card> hand) {
@@ -41,7 +36,27 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
     public Enum getHandType() {
         return this.handType;
     }
+    
+    public Map getHandMap(){
+        return this.handMap;
+    }
+    
+    public Card getCard(int index){
+        return this.hand.get(index);
+    }
+    
+    public void removeCard(int index){
+        this.hand.remove(index);
+    }
 
+    public void addCard(int index, Card card){
+        try{
+            this.hand.add(index, card);
+        }catch(IndexOutOfBoundsException e){
+            System.err.println("L56 Hand. Index greater than 4 or less than 0. Error => " + e);
+        }
+    }
+    
     /**
      * Sorts given Hand by card Rank.
      *
@@ -49,15 +64,8 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
      */
     public final void sortHand(List<Card> hand) {
 
-//        Collections.sort(hand, new Comparator<Card>(){
-//            @Override
-//            public int compare(Card card1, Card card2){
-//                    return card1.compareTo(card2);
-//            }
-//        });
-//      Collections.sort(hand, Card::compareTo); //Using member reference
+//      Sort Hand by the Highest Card
         Collections.sort(hand, (Card card1, Card card2) -> card1.compareTo(card2)); //Lambda expression
-
         Collections.reverse(hand);
     }
 
@@ -111,28 +119,16 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
             }
         }
 
+        this.handMap = rankMap;
         handMapRanks = rankMap.values();
         handMapSuits = suitMap.values();
-// =============== SORT BY HIGHEST PAIR =================
 
         if (handMapRanks.contains(4)) {
             /**
-             * Hand Rank = 2, 4 of a Kind - 4 cards of the same value. 5th can
+             * Hand Rank = 2, 4 of a Kind - 4 cards of the same Rank. 5th can
              * be any 5,5,5,5,7
              */
             this.handType = HandType.FOUR_OF_A_KIND;
-
-            rankMap.keySet().forEach((Object key) -> {
-                //Determine which rank makes 4 of a kind
-                if ((int) rankMap.get(key) == 4) {
-                    //put cards making up a hand with this key first
-
-                } else {
-                    //use next key to organize cards
-
-                }
-            });
-
         } else if (handMapRanks.contains(3)) {
             //check if there is 3 and 2
             if (handMapRanks.contains(3) && handMapRanks.contains(2)) {
@@ -162,7 +158,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
                  * + 1)
                  */
                 this.handType = HandType.ONE_PAIR;
-// =============== SORT BY HIGHEST PAIR =================
             }
         } else if (this.isStright()) {
             /**
@@ -170,7 +165,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
              * 10,9,8,7,6
              */
             this.handType = HandType.STRIGHT;
-            //sort by highest card
 
         } else if (Collections.frequency(handMapSuits, 5) == 1) {
             /**
@@ -178,7 +172,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
              * determine which Flush is the strongest?
              */
             this.handType = HandType.FLUSH;
-            //sort by highest card
 
         } else if (Collections.frequency(handMapSuits, 5) == 1 && this.isStright()) {
             /**
@@ -187,7 +180,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
              * suit.
              */
             this.handType = HandType.STRIGHT_FLUSH;
-            //sort by highest card
 
         } else {
             /**
@@ -196,17 +188,9 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
              * is a high hand
              */
             handType = HandType.HIGH_CARD;
-            //sort by highest card
         }
     }//determineHandType()
 
-//    /**
-//     * Compare one hand to another card by card.
-//     * @param hand 
-//     */
-//    public void compareHandByCard(List<Card> hand){
-//        Collections.sort(hand, Card::compareTo);
-//    }
     /**
      * @return
      */
@@ -220,7 +204,7 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
         return output;
     }
 
-//    ITERATOR METHODS
+// ============== ITERATOR METHODS ==============
     @Override
     public boolean hasNext() {
         return card_counter < this.hand.size();
