@@ -5,20 +5,19 @@
  */
 package poker;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  *
  * @author Alexander Frolov
  */
 public class Player {
-    private int wager = 0;
+    private int wallet = 0;
     private Hand hand = null;
     private Enum player_type = null;
     
-    public Player(int wager, Hand hand, Enum player_type){
-        this.wager = wager;
+    public Player(int wallet, Hand hand, Enum player_type){
+        this.wallet = wallet;
         this.hand = hand;
         this.player_type = player_type;
     }
@@ -27,12 +26,16 @@ public class Player {
         this(500, hand, player_type);
     }
     
-    public void setWager(int wager){
-        this.wager = wager;
+    public void setWallet(int wallet){
+        this.wallet = wallet;
     }
     
-    public int getWager(){
-        return this.wager;
+    public int getWallet(){
+        return this.wallet;
+    }
+    
+    public void addToWallet(int pot) {
+        this.wallet += pot;
     }
     
     public void setHand(Hand hand){
@@ -43,49 +46,82 @@ public class Player {
         return this.hand;
     }
     
+    public boolean ableToBet(int betAmount) {
+        return (this.getWallet() != 0 && (this.getWallet() - betAmount) > 0);
+    }
+    
+      
     /**
      * Rise - to rise the bet
-     * A player who thinks he has a good hand (or who wants the other players
-     * to think he has a good hand) may increase the wager required to continue
-     * playing.
+ A player who thinks he has a good hand (or who wants the other players
+ to think he has a good hand) may increase the wallet required to continue
+ playing.
+     * 
+     * @param howMuch
+     * @return howMuch if enough money or If there is not enough money return 0.
      */
-    public void rise(){
-        
+    public int rise(int howMuch){
+        if(this.getWallet() != 0 && (this.getWallet() - howMuch) > 0){
+            this.setWallet(this.getWallet() - howMuch);
+            return howMuch;
+        }
+        return 0;
     }
+    //rise()
+    
     /**
      * Fold - to let go of the bet.
      * A player who thinks his hand is not good enough to win and who does
-     * not want to wager the increased amount may lay down his cards. He
-     * cannot win the hand, but he also will not lose any more chips.
+ not want to wallet the increased amount may lay down his cards. He
+ cannot win the hand, but he also will not lose any more chips.
      */
     public void fold(){
         
     }
     
     /**
-     * Call - to equal the amount of wager
-     * Once a player has raised the stakes, each player must decide whether
-     * to raise the stakes again, to give in and fold his hand, or to call,
-     * which means to equal the amount wagered by the player who raised.
+     * Call - to equal the amount of wallet
+ Once a player has raised the stakes, each player must decide whether
+ to raise the stakes again, to give in and fold his hand, or to call,
+ which means to equal the amount wagered by the player who raised.
+     * @param wager
+     * @return wallet if enough money or If there is not enough money return 0.
      */
-    public void call(){
-        
+    public int call(int wager){
+        return this.rise(wager);
     }
     
     /**
      * Check - Pass the turn if no one raised the bet.
-     * If no one has increased the wager required to continue, a player may
-     * stand pat by checking, or passing on his option to bet.
+     * If no one has increased the wallet required to continue, a player may
+ stand pat by checking, or passing on his option to bet.
      */
     
     public void check(){
         
     }
     
+    /**
+     * Bank gives card index to remove and new Card from Deck to add
+     * key: card index in the Hand
+     * value: Card object.
+     * @param cardsToSwap
+     */
+    public void swapCards(Map cardsToSwap){
+        //get set of keys
+        cardsToSwap.keySet().forEach((Object key) -> {
+            //transform key into indexes
+            int index = (int) key;
+            //replace card in the hand with new one.
+            Player.this.getHand().removeCard(index);
+            Player.this.getHand().addCard(index, (Card)cardsToSwap.get(key));
+        });
+    }
+    
     @Override
     public String toString(){
         String output = "Hand: " + this.hand + "\n";
-        output += "Wager: " + this.wager + "\n";
+        output += this.getPlayerType() + " Wallet: " + this.getWallet() + "\n";
         return output;
     }
 

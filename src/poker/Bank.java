@@ -8,10 +8,17 @@ import java.util.*;
 /**
  *  Accept wagers and calculates win also adds wagers to the player's account
  * Bank size number is $500 for everyone.
+ * TODO: To determine winners bank sorts players from best hand to worst.
+ * when accessing the list of players for accounting players appear
+ * in different places after every round.
+ * Fix players and only shuffle winners.
+ * 
+ * 
  * @author Alexander Frolov
  */
 public class Bank {
     //Number of players in  the game
+    private int pot = 0;
     private int num_of_players = 0;
     private final List<Player> players = new ArrayList<>();
     private Deck deck;
@@ -32,7 +39,7 @@ public class Bank {
         this(2);
     }
     
-//    ========  METHODS
+//    ========  GETTERS/SETTERS ========
 
     private void initPlayers(){
         players.add(new Player(this.deck.dialHand(), PlayerType.COMPUTER));
@@ -41,12 +48,53 @@ public class Bank {
         }
     }
     
+    public void dealNewRound(){
+        //Clear winner_list and Pot
+        this.clearWinningList();
+        this.setPot(0);
+        this.deck = new Deck();
+        this.players.forEach( player -> {
+            player.setHand(deck.dialHand());
+        });
+    }
+    
     public Player getPlayer(int index){
         return this.players.get(index);
     }
     
     public Enum getPlayerType(int index){
         return this.players.get(index).getPlayerType();
+    }
+    
+    public List<Player> getPlayers() {
+        return this.players;
+    }
+    
+//  ======== POT OPERATIONS =======
+    
+    public void addToPot(int betAmount) {
+        if(betAmount > 0){
+            this.pot += betAmount;
+        }
+    }
+    
+    public int getPot(){
+        return this.pot;
+    }
+    
+    public void setPot(int amount){
+        this.pot = amount;
+    }
+    
+    public int splitPot(int numOfPlayers){
+        //Do not want to mess around with odd numbers
+        int splitPot = this.pot / 2;
+        this.setPot(0);
+        return splitPot;
+    }
+    
+    public void clearWinningList(){
+        this.winning_list.clear();
     }
     
     /**
@@ -120,8 +168,15 @@ public class Bank {
         }else {
             //there is one definite winner.
             winning_list.add(this.getPlayer(0));
-            System.out.println("L78 Bank - there is 1 winner" + winning_list.get(0));
+            System.out.println("L169 Bank - there is 1 winner" + winning_list.get(0));
         }
+        
+        //Sort players back into original position for accounting purpuses
+        Collections.sort(
+            players, (Player player1, Player player2) -> 
+                player1.getPlayerType().ordinal() - player2.getPlayerType().ordinal()
+        );
+        
         return winning_list;
     }//getWinner()
     
@@ -193,5 +248,6 @@ public class Bank {
             } 
         });
     }//sortHandByPairs()
+
     
 }//class
