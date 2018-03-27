@@ -51,6 +51,17 @@ public class Deck {
         return (new Hand(hand));
     }
     
+    public Card dealCard(){
+        Card aCard = null;
+        
+        if(!this.deck.isEmpty()){
+            aCard = this.deck.get(0);
+            this.deck.remove(0);
+        }
+
+        return aCard;
+    }
+    
     //mix cards
     public final void shuffleCards(){
         Collections.shuffle(this.deck);

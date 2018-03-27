@@ -58,6 +58,15 @@ public class Bank {
         });
     }
     
+    public Player getPlayer(PlayerType playerType){
+        
+        for(Player player: this.players){
+            if(player.getPlayerType() == playerType)
+            return player;
+        }
+        return null;
+    }
+    
     public Player getPlayer(int index){
         return this.players.get(index);
     }
@@ -134,13 +143,13 @@ public class Bank {
                     break;
                 case 3: //Fall through HandType.FULL_HOUSE
                 case 6: //Fall through HandType.THREE_OF_A_KIND
-                    System.out.println("\nL90 Bank - FULL_HOUSE or THREE_OF_A_KIND");
+                    System.out.println("\nL137 Bank - FULL_HOUSE or THREE_OF_A_KIND");
                     this.sortHandByPairs(player0_hand, 3);
                     this.sortHandByPairs(player1_hand, 3);
                     break;
                 case 7: //Fall through HandType.TWO_PAIRS
                 case 8: //Fall through HandType.ONE_PAIR
-                    System.out.println("\nL82 Bank - TWO_PAIRS or ONE_PAIR");
+                    System.out.println("\nL143 Bank - TWO_PAIRS or ONE_PAIR");
                     this.sortHandByPairs(player0_hand, 2);
                     this.sortHandByPairs(player1_hand, 2);
                     //Sort Player hand by a group of cards.
@@ -161,14 +170,14 @@ public class Bank {
             
             //if winner list is stil empty = 2 winners
             if(winning_list.isEmpty()){
-                System.out.println("L99 Bank - there are 2 winners");
+                System.out.println("L164 Bank - there are 2 winners");
                 winning_list.add(this.getPlayer(0));
                 winning_list.add(this.getPlayer(1));    
             }
         }else {
             //there is one definite winner.
             winning_list.add(this.getPlayer(0));
-            System.out.println("L169 Bank - there is 1 winner" + winning_list.get(0));
+            System.out.println("L171 Bank - there is 1 winner" + winning_list.get(0));
         }
         
         //Sort players back into original position for accounting purpuses
@@ -184,16 +193,19 @@ public class Bank {
      * 
      */
     private void compareHandsByCard (){
-        for(Card card: this.getPlayer(0).getHand()){
-            Card other_card = this.getPlayer(1).getHand().next();
+        Card card;
+        Hand hand = this.getPlayer(0).getHand();
+        for(int index = 0; index < hand.size(); ++index ){
+            card = hand.getCard(index);
+            Card other_card = this.getPlayer(1).getHand().getCard(index);
             if(card.compareTo(other_card) < 0){
                 //player 1 Wins
-                System.out.println("L94 Bank - Equal hands there is 1 winners");
+                System.out.println("L191 Bank - Equal hands there is 1 winners");
                 winning_list.add(this.getPlayer(1));
                 return;
             }else if(card.compareTo(other_card) > 0){
                 //player 2 wins
-                System.out.println("L98 Bank - Equal hands there is 1 winners");
+                System.out.println("L196 Bank - Equal hands there is 1 winners");
                 winning_list.add(this.getPlayer(0));
                 return;
             }

@@ -10,13 +10,12 @@ package poker;
 
 //TODO:
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  *
  * @author Alexander Frolov
  */
-public class Hand implements Iterator<Card>, Iterable<Card> {
+public class Hand implements Iterable<Card> {
 
     private List<Card> hand;
     private Enum handType;
@@ -59,7 +58,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
     
     /**
      * Sorts given Hand by card Rank.
-     *
      * @param hand
      */
     public final void sortHand(List<Card> hand) {
@@ -73,7 +71,6 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
      * Hand Rank = 5 - Straight All cards are in descending order. Suits are
      * different if suits are the same it is Straight Flush (Straight + Flush)
      * 10,9,8,7,6 If difference between i and i+1 == 1 it is straight.
-     *
      * @return
      */
     public boolean isStright() {
@@ -204,31 +201,15 @@ public class Hand implements Iterator<Card>, Iterable<Card> {
         return output;
     }
 
+    public int size(){
+        return this.hand.size();
+    }
+    
 // ============== ITERATOR METHODS ==============
-    @Override
-    public boolean hasNext() {
-        return card_counter < this.hand.size();
-    }
-
-    @Override
-    public Card next() {
-        if (card_counter == this.hand.size()) {
-            card_counter = 0;
-            throw new NoSuchElementException();
-        }
-
-        ++card_counter;
-        return this.hand.get(card_counter - 1);
-    }
 
     @Override
     public Iterator<Card> iterator() {
-        return this;
+        card_counter = 0;
+        return this.hand.listIterator();
     }
-
-    @Override
-    public void forEach(Consumer<? super Card> action) {
-        Iterable.super.forEach(action); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }//class

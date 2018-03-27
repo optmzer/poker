@@ -47,7 +47,7 @@ public class Player {
     }
     
     public boolean ableToBet(int betAmount) {
-        return (this.getWallet() != 0 && (this.getWallet() - betAmount) > 0);
+        return (this.getWallet() != 0 && betAmount > 0 && (this.getWallet() - betAmount) > 0);
     }
     
       
