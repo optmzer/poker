@@ -43,6 +43,7 @@ public class Player {
     }
     
     public Hand getHand(){
+        this.hand.determineHandType();
         return this.hand;
     }
     
@@ -108,15 +109,17 @@ public class Player {
      * @param cardsToSwap
      */
     public void swapCards(Map cardsToSwap){
-        //get set of keys
-        cardsToSwap.keySet().forEach((Object key) -> {
-            //transform key into indexes
-            int index = (int) key;
-            //replace card in the hand with new one.
-            Player.this.getHand().removeCard(index);
-            Player.this.getHand().addCard(index, (Card)cardsToSwap.get(key));
-        });
-    }
+        if(cardsToSwap != null){
+            //get set of keys
+            cardsToSwap.keySet().forEach((Object key) -> {
+                //transform key into indexes
+                int index = ((int)key) - 1;
+                //replace card in the hand with new one.
+                Player.this.getHand().removeCard(index);
+                Player.this.getHand().addCard(index, (Card)cardsToSwap.get(key));
+            });
+        }
+    }//swapCards()
     
     @Override
     public String toString(){

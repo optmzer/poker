@@ -4,6 +4,7 @@
 package poker;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  *  Accept wagers and calculates win also adds wagers to the player's account
@@ -113,7 +114,11 @@ public class Bank {
      * @return 
      */
     public List<Player> getWinner(){
-        
+        //Determine hand type
+        players.forEach(player -> {
+            player.getHand().determineHandType();
+        });
+        //Sort players by the highest hend
         Collections.sort(
             players, (Player player1, Player player2) -> 
                 player1.getHand().getHandType().ordinal() - player2.getHand().getHandType().ordinal()
@@ -261,5 +266,20 @@ public class Bank {
         });
     }//sortHandByPairs()
 
-    
+    public void swopCards(PlayerType player, List<Integer> listOfIndexes){
+        //search for the player
+        System.out.println("L268 bank. " + player + " cards are being replaced: ");
+        
+        Map cardsToSwap = new HashMap();
+        Player aPlayer = this.getPlayer(player);
+        
+        //Deck get cards for each index
+        listOfIndexes.forEach((Integer number) -> {
+            System.out.print(number + ", ");
+            cardsToSwap.put(number, deck.dealCard());
+        });
+        
+        //replace cards
+        aPlayer.swapCards(cardsToSwap);
+    }//swopCards()
 }//class

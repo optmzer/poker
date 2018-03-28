@@ -25,7 +25,6 @@ public class Hand implements Iterable<Card> {
 
     public Hand(List<Card> hand) {
         if (hand.size() == 5) {
-            this.sortHand(hand);
             this.hand = hand;
             this.determineHandType();
         }
@@ -85,7 +84,7 @@ public class Hand implements Iterable<Card> {
         return counter == 4;
     }
 
-    private void determineHandType() {
+    public final void determineHandType() {
         Map rankMap = new HashMap();
         Map suitMap = new HashMap();
         String keyRank;
@@ -93,6 +92,8 @@ public class Hand implements Iterable<Card> {
         Collection handMapRanks;
         Collection handMapSuits;
 
+        sortHand(this.hand);
+        
         /**
          * Creates a Map with key = Card Rank, value - number of repetitions
          * keyRank = rank of the card keySuit = suit of the card
@@ -193,10 +194,16 @@ public class Hand implements Iterable<Card> {
      */
     @Override
     public String toString() {
+        int index = 0;
         String output = "" + this.handType + ":\n";
-        Iterator handIt = hand.iterator();
-        while (handIt.hasNext()) {
-            output += " " + handIt.next();
+        for(Card card: this.hand){
+            output += " " + card;
+        }
+        
+        output += "\n";
+        
+        for(Card card: this.hand){
+            output += "    " + (++index) + "    ";
         }
         return output;
     }
