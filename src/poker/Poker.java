@@ -23,15 +23,14 @@ public class Poker {
         Bank bank = new Bank();
         Scanner scan;
         
-       
+//        showStartMenu();
         
         do{
-        showMainMenu();
             bank.dealNewRound();
             scan = new Scanner(System.in);
             //this type of try block auto closes resource.
             try {
-
+                    showPlayAgain();
                     user_input = Integer.parseInt(scan.nextLine());
 
                     switch(user_input){
@@ -60,42 +59,68 @@ public class Poker {
                             showPlayersBallance(bank);
                             break;
                         case 2:
-                            System.out.println("Continue Saved Game");
+                            //open prev game if it exist
+                            showLoadGameDialog(bank);
+                            //Return message if file does not exist saying 
+                            //the slot is empty.
+                            //if not offer a message to make one.
+//                            user_input = 3; //They might want to carry on playing
                             break;
                         case 3:
+                            //open prev game if it exist
+                            showSaveGameDialog(bank);
+                            //if not offer a message to make one.
+//                            user_input = 3; //They might want to carry on playing
+                            break;
+                        case 4:
                             System.out.println("Program Exit");
                             break;
                         default:
                             System.out.println("No such number. Try again.\n");
                     }
             } catch (NumberFormatException e) {
-                System.out.println("Please type an option 1, 2 or 3 and try again.");
+                System.out.println("Please type an option 1, 2, 3 or 4 and try again.");
             }
             //Save game or Play again
 //            showPlayAgain();
-        }while(user_input != 3);
+        }while(user_input != 4);
         
         scan.close();
         
     }//main()
     
-    private static void showMainMenu(){
+    private static void showStartMenu(){
         System.out.println("\n=========== Welcome to the Poker Game ===========");
         System.out.println("=================== Draw Poker ==================");
 
         System.out.println("Press (1) to Play");
-        System.out.println("Press (2) to Saved Game");
-        System.out.println("Press (3) to Exit");
+        System.out.println("Press (2) to Load Game");
+        System.out.println("Press (3) to Save Game");
+        System.out.println("Press (4) to Exit");
         System.out.print("> ");//Prompt.
-    }//mainMenu()
+    }//showStartMenu()
     
     private static void showPlayAgain(){
         System.out.println("\n=================== Poker Game ==================");
         System.out.println("=================== Draw Poker ==================");
-        System.out.println("Press (1) to Play Again");
-        System.out.println("Press (2) to Save Game");
-        System.out.println("Press (3) to Exit");
+        System.out.println("Press (1) to Play");
+        System.out.println("Press (2) to Load Game");
+        System.out.println("Press (3) to Save Game");
+        System.out.println("Press (4) to Exit");
         System.out.print("> ");//Prompt.
+    }
+    
+    public static void showLoadGameDialog(Bank bank){
+        //2 - Load game from the file
+        //Or return message to say that file not found or does not exist yet.
+        System.out.println("Loading saved game from file.");
+        bank.loadGame();
+    }
+    
+    private static void showSaveGameDialog(Bank bank){
+        // 3 - Save to file
+        bank.saveGame();
+        System.out.println("Your game has been saved.");
     }
     
     private static void showHands(Bank bank){
@@ -138,15 +163,15 @@ public class Poker {
         
         System.out.println("Pot size $" + bank.getPot());
         
-        System.out.println("You have $" + player1.getWallet() + " left");
-        System.out.println("Computer $" + computer.getWallet() + " left");
+        System.out.println(player1.getPlayerType() + " have $" + player1.getWallet() + " left");
+        System.out.println(computer.getPlayerType() + " has  $" + computer.getWallet() + " left");
     }//showMakeBet()
     
     private static void showPlayersBallance(Bank bank){
         System.out.println("  ================== Balans: ================= ");
-        bank.getPlayers().forEach(player -> {
+        for(Player player: bank.getPlayers()){
             System.out.print("     " + player.getPlayerType() + ": $" + player.getWallet());
-        });
+        }
         System.out.println("\n  ============================================ ");
     }
     
@@ -180,7 +205,7 @@ public class Poker {
         }//for
         
         System.out.println("You can swap up to " + swapLimit + " cards");
-        System.out.println("Enter card numbers in sequence separated space [1 3 ...]");
+        System.out.println("Enter card numbers you want to swap in sequence [1 2 3 ...]");
         System.out.print(">");
         
         //TODO:
@@ -201,10 +226,13 @@ public class Poker {
                         cardIndexes.add(Integer.parseInt(token));
 //                        System.out.println("L199 cardIndexes[" + i + "] = " + cardIndexes.get(i));
                     }
+                }else{
+                    System.out.println("Please enter integers 1 to 5.");
+                    System.out.print(">");
                 }
             }catch(NoSuchElementException | NumberFormatException | IllegalStateException e){
                 System.err.println("Error = " + e);
-                System.err.println("You need to enter number from 1 to 5 like so > 1, 2, 3");
+                System.out.println("You need to enter number from 1 to 5 like so > 1, 2, 3");
             }
             
         }while(cardIndexes.isEmpty());

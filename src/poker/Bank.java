@@ -3,9 +3,8 @@
  */
 package poker;
 
+import java.io.*;
 import java.util.*;
-import java.util.function.Consumer;
-
 /**
  *  Accept wagers and calculates win also adds wagers to the player's account
  * Bank size number is $500 for everyone.
@@ -24,8 +23,6 @@ public class Bank {
     private final List<Player> players = new ArrayList<>();
     private Deck deck;
     private final List<Player> winning_list = new ArrayList<>();
-    
-
     
 //    ========  CONSTRUCTORS 
     
@@ -175,7 +172,7 @@ public class Bank {
             
             //if winner list is stil empty = 2 winners
             if(winning_list.isEmpty()){
-                System.out.println("L164 Bank - there are 2 winners");
+                System.out.println("L182 Bank - there are 2 winners");
                 winning_list.add(this.getPlayer(0));
                 winning_list.add(this.getPlayer(1));    
             }
@@ -210,7 +207,7 @@ public class Bank {
                 return;
             }else if(card.compareTo(other_card) > 0){
                 //player 2 wins
-                System.out.println("L196 Bank - Equal hands there is 1 winners");
+                System.out.println("L217 Bank - Equal hands there is 1 winners");
                 winning_list.add(this.getPlayer(0));
                 return;
             }
@@ -250,18 +247,20 @@ public class Bank {
             }
         }
         //This will work for 4 of a kind and 3 of a kind, as well as full house.
+        //Should work for OnePair as well.
         hand.getHandMap().keySet().forEach((Object key) -> {
             Card temp_card;
-            //Determine which rank makes 4 of a kind
+            //Determine which rank makes a hand
             if ((int) hand.getHandMap().get(key) == first_pair) {
-                //put cards making up a hand with this key first
-                for(int i = 0; i < 5; ++i){
+                //put cards making up a hand with this key to the left most position
+                for(int i = 0; i < hand.size(); ++i){
                     if(hand.getCard(i).getRank().toString() == key){
                         temp_card = hand.getCard(i);
                         hand.removeCard(i);
                         hand.addCard(0, temp_card);
                     }
                 }
+                System.out.println(hand);
             } 
         });
     }//sortHandByPairs()
@@ -282,4 +281,55 @@ public class Bank {
         //replace cards
         aPlayer.swapCards(cardsToSwap);
     }//swopCards()
+
+    /**
+     * Only saves player1.
+     */
+    public void saveGame() {
+        
+        Writer bWriter;
+        try{
+            bWriter = new BufferedWriter(new FileWriter("SavedGame.txt"));
+            for(Player aPlayer: this.players){
+                if(aPlayer.getPlayerType().equals(PlayerType.PLAYER_1)){
+                    bWriter.write(aPlayer.getPlayerType() + " $" + aPlayer.getWallet() + "\n");
+                }
+            }
+            bWriter.close();
+        }catch(IOException e){
+            System.err.println("L298 bank Error writing file => " + e);
+        }
+        System.out.println("L305 bank Game Saved");
+    }//saveGame()
+    
+    /**
+     * Loads player1 to the game.
+     */
+    public void loadGame(){
+        Scanner scan;
+        String[] playerEntry;
+        int money = 0;
+        try{
+            //load data from a file
+            scan = new Scanner(new FileReader("SavedGame.txt"));
+
+            //get player ballance
+            if(scan.hasNext()){
+                playerEntry = scan.nextLine().split("\\$");
+                money = Integer.parseInt(playerEntry[1]);
+            }
+            
+            scan.close();
+            //bank getPlayer1
+            this.getPlayer(PlayerType.PLAYER_1).setWallet(money);
+            //show player
+            System.out.println("Player 1 has $" + this.getPlayer(PlayerType.PLAYER_1).getWallet());
+            
+        }catch(IOException | NoSuchElementException e){
+            System.out.println("File not found. Cannot find 'SavedGames.txt' at specified location.");
+            System.out.println("Either file does not exist or was relocated.");
+            System.out.println("Try Save Game first then Load.");
+        }
+        
+    }//loadGame()
 }//class
