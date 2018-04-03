@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class Bank {
     //Number of players in  the game
-    private int minimumBet = 2;
+    private final int minimumBet = 2;
     private int pot = 0;
     private int num_of_players = 0;
     private final List<Player> players = new ArrayList<>();
@@ -135,7 +135,7 @@ public class Bank {
             player.getHand().determineHandType();
             if(player.getBetType() != BetType.FOLD){
                 this.winning_list.add(player);
-                System.out.println("L127 Bank winning_list " + player.getPlayerType() + " BetType: " + player.getBetType());
+//                System.out.println("L138 Bank winning_list " + player.getPlayerType() + " BetType: " + player.getBetType());
             }
         });
         //Sort players by the highest hand
@@ -153,10 +153,6 @@ public class Bank {
         if  (winning_list.size() > 1){
             if(this.getPlayerFromWinningList(0).getHand().getHandType() == this.getPlayerFromWinningList(1).getHand().getHandType()){
                 int handType = this.getPlayerFromWinningList(0).getHand().getHandType().ordinal();
-//                Player possible_winner_1 = this.getPlayerFromWinningList(0);
-//                Player possible_winner_2 = this.getPlayerFromWinningList(1);
-//                Hand player0_hand = possible_winner_1.getHand();
-//                Hand player1_hand = possible_winner_2.getHand();
                 /**there are 2 players with the same hand
                 * check which hand is higher
                 * For straight hands and flashes compare cards one by one
@@ -207,7 +203,6 @@ public class Bank {
                 Player tempPlayer = this.getPlayerFromWinningList(0);
                 winning_list.clear();
                 winning_list.add(tempPlayer);
-                System.out.println("L194 Bank - there is 1 winner" + tempPlayer);
             }
         }
         
@@ -230,12 +225,9 @@ public class Bank {
         for(int index = 0; index < hand.size(); ++index ){
             card = hand.getCard(index);
             other_card = otherHand.getCard(index);
-            System.out.println("card = " + card + ", other_card = " + other_card + " index = " + index);
-            System.out.println("card.compareTo(other_card) = " + card.compareTo(other_card));
             
             if(card.compareTo(other_card) < 0){
                 //player 1 Wins
-                System.out.println("L234 Bank - Equal hands there is 1 winner " + this.getPlayerFromWinningList(1).getPlayerType());
                 Player tempPlayer = this.getPlayerFromWinningList(1);
                 winning_list.clear();
                 winning_list.add(tempPlayer);
@@ -244,14 +236,11 @@ public class Bank {
             
             if(card.compareTo(other_card) > 0){
                 //player 2 wins
-                System.out.println("L241 Bank - Equal hands there is 1 winner " + this.getPlayerFromWinningList(0).getPlayerType());
                 Player tempPlayer = this.getPlayerFromWinningList(0);
                 winning_list.clear();
                 winning_list.add(tempPlayer);
                 return;
             }
-               
-//            System.out.println("Comparing cards " + card + " Player 1 = " + other_card + " result " + card.compareTo(other_card));
         }//
     }//compareHandsByCard()
     
@@ -306,17 +295,14 @@ public class Bank {
 
     public void swopCards(PlayerType playerType, List<Integer> listOfIndexes){
         //search for the player
-//        System.out.println("L303 bank. " + playerType + " cards are being replaced: ");
         
         Map cardsToSwap = new HashMap();
         Player aPlayer = this.getPlayer(playerType);
         
         //Deck get cards for each index
         listOfIndexes.forEach((Integer number) -> {
-            System.out.print(number + ", ");
             Card aCard = deck.dealCard();
             cardsToSwap.put(number, aCard);
-//            System.out.println("Index = " + number + " Card = " + aCard);
         });
         
         //replace cards

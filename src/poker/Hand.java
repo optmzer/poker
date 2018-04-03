@@ -51,7 +51,7 @@ public class Hand implements Iterable<Card> {
         try{
             this.hand.add(index, card);
         }catch(IndexOutOfBoundsException e){
-            System.err.println("L56 Hand. Index greater than 4 or less than 0. Error => " + e);
+            System.err.println("L54 Hand. Index greater than 4 or less than 0. Error => " + e);
         }
     }
     

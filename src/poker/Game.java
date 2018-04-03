@@ -34,7 +34,7 @@ public class Game {
                         case 1:
                             //game logic
 //                          1 - Dial cards
-                            showHands(bank);
+                            showCards(bank);
                             showPlayersBallance(bank);
                             
 //                          2 - First Round of Betting
@@ -48,14 +48,14 @@ public class Game {
                             showOfferCardSwap(bank, scan);
                             
 //                          4 - Second round of Betting
-                            showHands(bank);
+                            showCards(bank);
                             showPlayersBallance(bank);
                             
                             showFoldCallRise(bank, scan);
                             //In any case after second round of bet
                             //We need to show winner. No need for if statement
 //                          5 - When betting is over check hands.
-
+//                            showHands(bank);
                             showWinners(bank);
                             showPlayersBallance(bank);
                             break;
@@ -123,11 +123,21 @@ public class Game {
         System.out.println("Your game has been saved.");
     }
     
-    private void showHands(Bank bank){
-        System.out.println("Play Game");
-        System.out.println("\nL102 Poker: "+ bank.getPlayer(0).getPlayerType() + " " + bank.getPlayer(0).getHand());
-        System.out.println("\nL103 Poker: "+ bank.getPlayer(1).getPlayerType() + " " + bank.getPlayer(1).getHand());
+    private void showCards(Bank bank){
+        Hand compHand = bank.getPlayer(0).getHand();
+        String compHandString = "";
+        for(Card card: compHand){
+            compHandString += "[XXXXXX] ";
+        }
+        System.out.println("\nL128 Poker: "+ bank.getPlayer(0).getPlayerType() + "\n " + compHandString);
+        System.out.println("\nL129 Poker: "+ bank.getPlayer(1).getPlayerType() + " " + bank.getPlayer(1).getHand());
     }//showHands()
+    
+    private void showHands(Bank bank){
+        System.out.println("  ============================================");
+        System.out.println(" Poker: "+ bank.getPlayer(0).getPlayerType() + " " + bank.getPlayer(0).getHand());
+        System.out.println(" Poker: "+ bank.getPlayer(1).getPlayerType() + " " + bank.getPlayer(1).getHand());
+    }
     
     private BetType showFoldCallRise(Bank bank, Scanner scan){
         String line = "";
@@ -137,7 +147,7 @@ public class Game {
             System.out.println("Press (1) - Rise");
             System.out.println("Press (2) - Call");
             System.out.println("Press (3) - Fold");
-            
+            System.out.print(">");
             try{
                 line = scan.nextLine();
                 userInput = Integer.parseInt(line);
@@ -152,6 +162,8 @@ public class Game {
             
         }while(userInput != 1 && userInput != 2 && userInput != 3);
 
+            System.out.println("  ============================================");
+            
             switch(userInput){
                 case 1://Rise
                     showMakeBet(bank, scan, BetType.RISE);
@@ -222,11 +234,13 @@ public class Game {
                 //give up the Pot.
                 break;
         }
-        
-        System.out.println("Pot size $" + bank.getPot());
+
+        System.out.println("  ============ POT SIZE $" + bank.getPot() + " ============");
         
         System.out.println(player1.getPlayerType() + " have $" + player1.getWallet() + " left");
         System.out.println(computer.getPlayerType() + " has  $" + computer.getWallet() + " left");
+        System.out.println("  ============================================");
+
     }//showMakeBet()
     
     private void showPlayersBallance(Bank bank){
@@ -270,28 +284,23 @@ public class Game {
         System.out.println("Enter card numbers you want to swap in sequence [1 2 3 ...]");
         System.out.println("Enter 0 if you do not want to swap.");
         System.out.print(">");
-        
-        //TODO:
+
         //Handls negative numbers by converting them to positive.
         //Get input from the Scanner parse it and make an ArrayList.
         do{
             try{
                 userInput = scan.nextLine();
-//                System.out.println("L188 Poker userInput = " + userInput);
-                
+                System.out.println("  ============================================ ");
                 tokens = userInput.replaceAll("[^0-5]", "");
-
+                //get integers from String input
                 if(!tokens.equals("")){
-//                    System.out.println("L193 Poker tokens = " + tokens);
                     for(int i = 0; i < tokens.length() && i < swapLimit; ++i){
                         String token = "" + tokens.charAt(i);
                         int index = Integer.parseInt(token);
                         if(0 == index){
                             return;
                         }
-//                        System.out.println("L196 Poker tokens = " + token);
                         cardIndexes.add(index);
-//                        System.out.println("L199 cardIndexes[" + i + "] = " + cardIndexes.get(i));
                     }
                 }else{
                     System.out.println("Please enter integers 0 to 5.");
@@ -307,7 +316,7 @@ public class Game {
         if(!cardIndexes.isEmpty()){
             bank.swopCards(PlayerType.PLAYER_1, cardIndexes);
         }
-        
+
     }//showOfferCardSwap()
     
     private void showWinners(Bank bank){
@@ -315,18 +324,20 @@ public class Game {
                                 
         if(winners.size() > 1){
             //there are 2 winners
-            System.out.println("L220 It is split :");
-            System.out.println("\nL221 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
-            System.out.println("\nL222 Poker: The winner is: " + winners.get(1).getPlayerType() + " with " + winners.get(1).getHand().getHandType());
+            System.out.println("L326 It is split :");
+//            System.out.println("\nL327 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
+//            System.out.println("\nL328 Poker: The winner is: " + winners.get(1).getPlayerType() + " with " + winners.get(1).getHand().getHandType());
             //Add split to computer and player1
+            
             int split = bank.splitPot(winners.size());
             winners.get(0).addToWallet(split);
             winners.get(1).addToWallet(split);
         }else{
-            System.out.println("\nL228 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
+            System.out.println("\nL334 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
             //Add split to computer and player1
             winners.get(0).addToWallet(bank.getPot());
         }
+        this.showHands(bank);
     }//showTwoWinners()
     
 }//class Game
