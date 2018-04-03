@@ -2,3 +2,5 @@
 SavedGame.txt
 #Ignore build directory
 build/
+test/
+nbproject/
