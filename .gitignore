@@ -1,2 +1,4 @@
 # Saved game data
 SavedGame.txt
+#Ignore build directory
+build/
