@@ -12,6 +12,8 @@ import java.util.*;
  * @author Alexander Frolov
  */
 public class Player {
+    
+    private Enum betType = BetType.CHECK;
     private int wallet = 0;
     private Hand hand = null;
     private Enum player_type = null;
@@ -47,22 +49,30 @@ public class Player {
         return this.hand;
     }
     
+    public Hand getUndeterminedHand(){
+        return this.hand;
+    }
+    
     public boolean ableToBet(int betAmount) {
         return (this.getWallet() != 0 && betAmount > 0 && (this.getWallet() - betAmount) > 0);
     }
     
-      
+    public Enum getBetType(){
+        return this.betType;
+    }
+    
     /**
      * Rise - to rise the bet
- A player who thinks he has a good hand (or who wants the other players
- to think he has a good hand) may increase the wallet required to continue
- playing.
+        A player who thinks he has a good hand (or who wants the other players
+        to think he has a good hand) may increase the wallet required to continue
+        playing.
      * 
      * @param howMuch
      * @return howMuch if enough money or If there is not enough money return 0.
      */
     public int rise(int howMuch){
         if(this.getWallet() != 0 && (this.getWallet() - howMuch) > 0){
+            this.betType = BetType.RISE;
             this.setWallet(this.getWallet() - howMuch);
             return howMuch;
         }
@@ -77,7 +87,7 @@ public class Player {
  cannot win the hand, but he also will not lose any more chips.
      */
     public void fold(){
-        
+        this.betType = BetType.FOLD;
     }
     
     /**
@@ -89,6 +99,7 @@ public class Player {
      * @return wallet if enough money or If there is not enough money return 0.
      */
     public int call(int wager){
+        this.betType = BetType.RISE;
         return this.rise(wager);
     }
     
@@ -97,9 +108,8 @@ public class Player {
      * If no one has increased the wallet required to continue, a player may
  stand pat by checking, or passing on his option to bet.
      */
-    
     public void check(){
-        
+        this.betType = BetType.CHECK;
     }
     
     /**
@@ -111,13 +121,13 @@ public class Player {
     public void swapCards(Map cardsToSwap){
         if(cardsToSwap != null){
             //get set of keys
-            cardsToSwap.keySet().forEach((Object key) -> {
-                //transform key into indexes
+            for(Object key: cardsToSwap.keySet()){
                 int index = ((int)key) - 1;
                 //replace card in the hand with new one.
-                Player.this.getHand().removeCard(index);
-                Player.this.getHand().addCard(index, (Card)cardsToSwap.get(key));
-            });
+                this.hand.removeCard(index);
+                this.hand.addCard(index, (Card)cardsToSwap.get(key));
+//                System.out.println("L125 Player New Hand = " + this.hand);
+            }
         }
     }//swapCards()
     

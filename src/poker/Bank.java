@@ -18,6 +18,7 @@ import java.util.*;
  */
 public class Bank {
     //Number of players in  the game
+    private int minimumBet = 2;
     private int pot = 0;
     private int num_of_players = 0;
     private final List<Player> players = new ArrayList<>();
@@ -52,6 +53,7 @@ public class Bank {
         this.setPot(0);
         this.deck = new Deck();
         this.players.forEach( player -> {
+            player.check();//Reset bet type to check if there was fold before.
             player.setHand(deck.dialHand());
         });
     }
@@ -67,6 +69,23 @@ public class Bank {
     
     public Player getPlayer(int index){
         return this.players.get(index);
+    }
+    
+    public Player getPlayerFromWinningList(int index){
+        return this.winning_list.get(index);
+    }
+    
+    public Player getPlayerFromWinningList(PlayerType playerType){
+        Player aPlayer = null;
+        if(!winning_list.isEmpty()){
+            for(Player player: this.winning_list){
+                if(player.getPlayerType() == playerType)
+                aPlayer = player;
+            }
+        }else{
+            aPlayer = this.getPlayer(playerType);
+        }
+        return aPlayer;
     }
     
     public Enum getPlayerType(int index){
@@ -111,13 +130,17 @@ public class Bank {
      * @return 
      */
     public List<Player> getWinner(){
-        //Determine hand type
+        //Move players who did not FOLD to winning_list and Determine hand type
         players.forEach(player -> {
             player.getHand().determineHandType();
+            if(player.getBetType() != BetType.FOLD){
+                this.winning_list.add(player);
+                System.out.println("L127 Bank winning_list " + player.getPlayerType() + " BetType: " + player.getBetType());
+            }
         });
-        //Sort players by the highest hend
+        //Sort players by the highest hand
         Collections.sort(
-            players, (Player player1, Player player2) -> 
+            this.winning_list, (Player player1, Player player2) -> 
                 player1.getHand().getHandType().ordinal() - player2.getHand().getHandType().ordinal()
         );
         
@@ -126,60 +149,66 @@ public class Bank {
          * at the beginning of the array.
          */
         
-        if(this.getPlayer(0).getHand().getHandType() == this.getPlayer(1).getHand().getHandType()){
-            int handType = this.getPlayer(0).getHand().getHandType().ordinal();
-            Player possible_winner_1 = this.getPlayer(0);
-            Player possible_winner_2 = this.getPlayer(1);
-            Hand player0_hand = possible_winner_1.getHand();
-            Hand player1_hand = possible_winner_2.getHand();
-            /**there are 2 players with the same hand
-            * check which hand is higher
-            * For straight hands and flashes compare cards one by one
-            * For the rest sort by the highest pair and then compare cards one by one.
-            */ 
-            switch(handType){
-                case 2: //Fall through HandType.FOUR_OF_A_KIND 
-                    System.out.println("\nL84 Bank - FOUR_OF_A_KIND");
-                    this.sortHandByPairs(player0_hand, 4);
-                    this.sortHandByPairs(player1_hand, 4);
-                    break;
-                case 3: //Fall through HandType.FULL_HOUSE
-                case 6: //Fall through HandType.THREE_OF_A_KIND
-                    System.out.println("\nL137 Bank - FULL_HOUSE or THREE_OF_A_KIND");
-                    this.sortHandByPairs(player0_hand, 3);
-                    this.sortHandByPairs(player1_hand, 3);
-                    break;
-                case 7: //Fall through HandType.TWO_PAIRS
-                case 8: //Fall through HandType.ONE_PAIR
-                    System.out.println("\nL143 Bank - TWO_PAIRS or ONE_PAIR");
-                    this.sortHandByPairs(player0_hand, 2);
-                    this.sortHandByPairs(player1_hand, 2);
-                    //Sort Player hand by a group of cards.
-                    //How many groups
-                    
-                    //Highest card wins
-                    break;
-                default:
-                //Fall through - HandType.STRIGHT_FLUSH value = 1
-                //Fall through - HandType.FLUSH         value = 4
-                //Fall through - HandType.STRIGHT       value = 5
-                //Fall through - HandType.HIGH_CARD     value = 9
-            }//switch(handType)
-                
-            //As hands already sorted I only need one method to determin 
-            //the highest hand.
-            compareHandsByCard();
-            
-            //if winner list is stil empty = 2 winners
-            if(winning_list.isEmpty()){
-                System.out.println("L182 Bank - there are 2 winners");
-                winning_list.add(this.getPlayer(0));
-                winning_list.add(this.getPlayer(1));    
+        //if hands are equal then compare them by the highest card.
+        if  (winning_list.size() > 1){
+            if(this.getPlayerFromWinningList(0).getHand().getHandType() == this.getPlayerFromWinningList(1).getHand().getHandType()){
+                int handType = this.getPlayerFromWinningList(0).getHand().getHandType().ordinal();
+//                Player possible_winner_1 = this.getPlayerFromWinningList(0);
+//                Player possible_winner_2 = this.getPlayerFromWinningList(1);
+//                Hand player0_hand = possible_winner_1.getHand();
+//                Hand player1_hand = possible_winner_2.getHand();
+                /**there are 2 players with the same hand
+                * check which hand is higher
+                * For straight hands and flashes compare cards one by one
+                * For the rest sort by the highest pair and then compare cards one by one.
+                */ 
+                switch(handType){
+                    case 2: //Fall through HandType.FOUR_OF_A_KIND 
+    //                    System.out.println("\nL84 Bank - FOUR_OF_A_KIND");
+                        for(Player player: winning_list){
+                            this.sortHandByPairs(player.getHand(), 4);
+                        }
+                        break;
+                    case 3: //Fall through HandType.FULL_HOUSE
+                    case 6: //Fall through HandType.THREE_OF_A_KIND
+    //                    System.out.println("\nL137 Bank - FULL_HOUSE or THREE_OF_A_KIND");
+                        for(Player player: winning_list){
+                            this.sortHandByPairs(player.getHand(), 3);
+                        }
+                        break;
+                    case 7: //Fall through HandType.TWO_PAIRS
+                    case 8: //Fall through HandType.ONE_PAIR
+                        //Sort Player hand by a group of cards.
+    //                    System.out.println("\nL143 Bank - TWO_PAIRS or ONE_PAIR");
+                        for(Player player: winning_list){
+                            this.sortHandByPairs(player.getHand(), 2);
+                        }
+                        break;
+                    default:
+                    //Fall through - HandType.STRIGHT_FLUSH value = 1
+                    //Fall through - HandType.FLUSH         value = 4
+                    //Fall through - HandType.STRIGHT       value = 5
+                    //Fall through - HandType.HIGH_CARD     value = 9
+                }//switch(handType)
+
+                //As hands already sorted I only need one method to determine 
+                //the highest hand.
+                //This function adds entry to the winning_list
+                this.compareHandsByCard();
+
+                //if winner list is stil empty = 2 winners
+//                if(winning_list.isEmpty()){
+//                    System.out.println("L185 Bank - there are 2 winners");
+//                    winning_list.add(this.getPlayer(0));
+//                    winning_list.add(this.getPlayer(1));    
+//                }
+            }else {
+                //there is one definite winner.
+                Player tempPlayer = this.getPlayerFromWinningList(0);
+                winning_list.clear();
+                winning_list.add(tempPlayer);
+                System.out.println("L194 Bank - there is 1 winner" + tempPlayer);
             }
-        }else {
-            //there is one definite winner.
-            winning_list.add(this.getPlayer(0));
-            System.out.println("L171 Bank - there is 1 winner" + winning_list.get(0));
         }
         
         //Sort players back into original position for accounting purpuses
@@ -195,24 +224,34 @@ public class Bank {
      * 
      */
     private void compareHandsByCard (){
-        Card card;
-        Hand hand = this.getPlayer(0).getHand();
+        Card card, other_card;
+        Hand hand = this.getPlayerFromWinningList(0).getUndeterminedHand();
+        Hand otherHand = this.getPlayerFromWinningList(1).getUndeterminedHand();
         for(int index = 0; index < hand.size(); ++index ){
             card = hand.getCard(index);
-            Card other_card = this.getPlayer(1).getHand().getCard(index);
+            other_card = otherHand.getCard(index);
+            System.out.println("card = " + card + ", other_card = " + other_card + " index = " + index);
+            System.out.println("card.compareTo(other_card) = " + card.compareTo(other_card));
+            
             if(card.compareTo(other_card) < 0){
                 //player 1 Wins
-                System.out.println("L191 Bank - Equal hands there is 1 winners");
-                winning_list.add(this.getPlayer(1));
+                System.out.println("L234 Bank - Equal hands there is 1 winner " + this.getPlayerFromWinningList(1).getPlayerType());
+                Player tempPlayer = this.getPlayerFromWinningList(1);
+                winning_list.clear();
+                winning_list.add(tempPlayer);
                 return;
-            }else if(card.compareTo(other_card) > 0){
+            }
+            
+            if(card.compareTo(other_card) > 0){
                 //player 2 wins
-                System.out.println("L217 Bank - Equal hands there is 1 winners");
-                winning_list.add(this.getPlayer(0));
+                System.out.println("L241 Bank - Equal hands there is 1 winner " + this.getPlayerFromWinningList(0).getPlayerType());
+                Player tempPlayer = this.getPlayerFromWinningList(0);
+                winning_list.clear();
+                winning_list.add(tempPlayer);
                 return;
             }
                
-            System.out.println("Comparing cards " + card + " Player 1 = " + other_card + " result " + card.compareTo(other_card));
+//            System.out.println("Comparing cards " + card + " Player 1 = " + other_card + " result " + card.compareTo(other_card));
         }//
     }//compareHandsByCard()
     
@@ -265,17 +304,19 @@ public class Bank {
         });
     }//sortHandByPairs()
 
-    public void swopCards(PlayerType player, List<Integer> listOfIndexes){
+    public void swopCards(PlayerType playerType, List<Integer> listOfIndexes){
         //search for the player
-        System.out.println("L268 bank. " + player + " cards are being replaced: ");
+//        System.out.println("L303 bank. " + playerType + " cards are being replaced: ");
         
         Map cardsToSwap = new HashMap();
-        Player aPlayer = this.getPlayer(player);
+        Player aPlayer = this.getPlayer(playerType);
         
         //Deck get cards for each index
         listOfIndexes.forEach((Integer number) -> {
             System.out.print(number + ", ");
-            cardsToSwap.put(number, deck.dealCard());
+            Card aCard = deck.dealCard();
+            cardsToSwap.put(number, aCard);
+//            System.out.println("Index = " + number + " Card = " + aCard);
         });
         
         //replace cards
@@ -332,4 +373,8 @@ public class Bank {
         }
         
     }//loadGame()
+
+    void playerFold(PlayerType playerType) {
+        this.getPlayerFromWinningList(PlayerType.PLAYER_1).fold();
+    }
 }//class
