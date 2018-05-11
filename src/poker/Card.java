@@ -87,7 +87,9 @@ public class Card implements Comparable<Card>{
     
     @Override
     public String toString(){
-        String output = "[" + getRank() + " " + getSuit().toString().charAt(0) + "]";
+//        String output = "[" + getRank() + " " + getSuit().toString().charAt(0) + "]";
+        String output = getRank() + " " + getSuit().toString().charAt(0);
+
         return output;
     }
 }//class

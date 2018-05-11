@@ -5,6 +5,7 @@
  */
 package poker;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.*;
