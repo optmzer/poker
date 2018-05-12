@@ -5,6 +5,8 @@
  */
 package poker;
 
+import java.awt.Image;
+
 /**
  *
  * @author Alexander Frolov
@@ -12,6 +14,7 @@ package poker;
 public class Card implements Comparable<Card>{
     private Enum card_suit;
     private Enum card_rank;
+    private Image img;
     
     public Card(Enum card_suit, Enum card_rank){
         this.card_suit = card_suit;
@@ -30,6 +33,14 @@ public class Card implements Comparable<Card>{
     }
     public void setRank(Enum card_rank){
         this.card_rank = card_rank;
+    }
+    
+    public void setImage(Image img){
+        this.img = img;
+    }
+    
+    public Image getCardImage(){
+        return this.img;
     }
     
     /**

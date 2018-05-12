@@ -16,15 +16,18 @@ import javax.swing.SwingUtilities;
  */
 public class Poker {
 
-    private static PokerView pView;
+    private static PokerController controller;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            pView = new PokerView();
-        });
-        
+        SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    controller = new PokerController(new Bank(), new MainViewPanel());
+                }
+            }
+        ); 
 //        new Game().startGame();
         
     }//main()
