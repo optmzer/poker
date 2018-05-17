@@ -11,19 +11,17 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import javax.swing.*;
 
 /**
  *
  * @author Alexander Frolov
  */
-public class PokerController extends JFrame implements ActionListener{
+public class PokerController extends JFrame implements ActionListener, MouseListener{
     
     private final Bank bank;
     
-    private MainViewPanel pokerView;
+    private final MainViewPanel pokerView;
     private JMenuBar menuBar;
     private JMenu menuFile;
     private JMenuItem newGame;
@@ -58,6 +56,9 @@ public class PokerController extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        this.pack();// this makes it as compact as possible
         this.setVisible(true);
+        this.setResizable(false);
+        
+        attachActionListeners();
     }
     
     /**
@@ -91,6 +92,17 @@ public class PokerController extends JFrame implements ActionListener{
         menuBar.add(menuFile);
     }//initMenuBar()
     
+    private void attachActionListeners(){
+        for(JLabel label: pokerView.getCardLabels()){
+            label.addMouseListener(this);
+        }
+        pokerView.getSkipLabel().addMouseListener(this);
+        pokerView.getSwapLabel().addMouseListener(this);
+        pokerView.getBetLabel().addMouseListener(this);
+        pokerView.getFoldLabel().addMouseListener(this);
+    }//attachActionListeners()
+    
+    
 //    ============================ GAME LOGIC ==============================
 
     private void startGame(){
@@ -98,7 +110,7 @@ public class PokerController extends JFrame implements ActionListener{
 //        showStartMenu();
             bank.dealNewRound();
             pokerView.setPlayers(bank.getPlayers());
-//                    showPlayAgain();
+            showHands(false);
 //                Once game has started it loops around till player quits through menu
 
                             //game logic
@@ -114,19 +126,19 @@ public class PokerController extends JFrame implements ActionListener{
 //                            }
                             
 //                          3 - trade cards
-                            showOfferCardSwap();
+//                            showOfferCardSwap();
                             
 //                          4 - Second round of Betting
-                            showCards();
-                            showPlayersBallance();
+//                            showCards();
+//                            showPlayersBallance();
                             
 //                            showFoldCallRise(bank, scan);
                             //In any case after second round of bet
                             //We need to show winner. No need for if statement
 //                          5 - When betting is over check hands.
 //                            showHands(bank);
-                            showWinners();
-                            showPlayersBallance();
+//                            showWinners();
+//                            showPlayersBallance();
                             
 //                        case 2:
                             //open prev game if it exist
@@ -161,10 +173,8 @@ public class PokerController extends JFrame implements ActionListener{
         }
     }
     
-    public void showHands(){
-        System.out.println("  ============================================");
-        System.out.println(" Poker: "+ bank.getPlayer(0).getPlayerType() + " " + bank.getPlayer(0).getHand());
-        System.out.println(" Poker: "+ bank.getPlayer(1).getPlayerType() + " " + bank.getPlayer(1).getHand());
+    public void showHands(boolean show){
+        pokerView.showCards(show);
     }
     
     private BetType showFoldCallRise(){
@@ -284,8 +294,6 @@ public class PokerController extends JFrame implements ActionListener{
         Hand player1_hand;
         
         int swapLimit = 3;
-        String tokens;
-        String userInput;
         
         System.out.print("What cards do you want to swap? ");
         //Up to 3 cards. If has an Ace can swap up untill 4.
@@ -303,37 +311,7 @@ public class PokerController extends JFrame implements ActionListener{
         }//for
         
         System.out.println("You can swap up to " + swapLimit + " cards");
-        System.out.println("Enter card numbers you want to swap in sequence [1 2 3 ...]");
-        System.out.println("Enter 0 if you do not want to swap.");
-        System.out.print(">");
-
-        //Handls negative numbers by converting them to positive.
-        //Get input from the Scanner parse it and make an ArrayList.
-//        do{
-//            try{
-////                userInput = scan.nextLine();
-////                System.out.println("  ============================================ ");
-////                tokens = userInput.replaceAll("[^0-5]", "");
-//                //get integers from String input
-//                if(!tokens.equals("")){
-//                    for(int i = 0; i < tokens.length() && i < swapLimit; ++i){
-//                        String token = "" + tokens.charAt(i);
-//                        int index = Integer.parseInt(token);
-//                        if(0 == index){
-//                            return;
-//                        }
-//                        cardIndexes.add(index);
-//                    }
-//                }else{
-//                    System.out.println("Please enter integers 0 to 5.");
-//                    System.out.print(">");
-//                }
-//            }catch(NoSuchElementException | NumberFormatException | IllegalStateException e){
-//                System.err.println("Error = " + e);
-//                System.out.println("You need to enter number from 0 to 5 like so > 1, 2, 3");
-//            }
-//            
-//        }while(cardIndexes.isEmpty());
+        
         //pass cardIndexes to the bank for swapping.
         if(!cardIndexes.isEmpty()){
             bank.swopCards(PlayerType.PLAYER_1, cardIndexes);
@@ -359,7 +337,7 @@ public class PokerController extends JFrame implements ActionListener{
             //Add split to computer and player1
             winners.get(0).addToWallet(bank.getPot());
         }
-        this.showHands();
+        this.showHands(true);
     }//showTwoWinners()
     
 //    ============================== HANDLERS ==============================
@@ -403,6 +381,68 @@ public class PokerController extends JFrame implements ActionListener{
         }
         
     }//actionPerformed
+    
+    //Mouse Actions
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Object source = e.getSource();
+        String card = e.getComponent().getName();
+        switch(card){
+            case "0":
+                System.out.println("Card 0");
+                break;
+            case "1":
+                System.out.println("Card 1");
+                break;
+            case "2":
+                System.out.println("Card 2");
+                break;
+            case "3":
+                System.out.println("Card 3");
+                break;
+            case "4":
+                System.out.println("Card 4");
+                break;
+            default:
+        }
+        
+        String actionLabel = e.getComponent().getName();
+        if(actionLabel.equalsIgnoreCase("Skip")){
+            System.out.println("Skip was pressed");
+            //Skip cards swap or betting 
+        }
+        if(actionLabel.equalsIgnoreCase("Swap")){
+            System.out.println("Swap was pressed");
+            //Swap cards
+        }
+        
+        if(actionLabel.equalsIgnoreCase("Bet")){
+            System.out.println("Bet was pressed");
+            //Place bet if enough money
+        }
+        
+        if(actionLabel.equalsIgnoreCase("Fold")){
+            System.out.println("Fold was pressed");
+            //Place bet if enough money
+        }
+    }//mouseClicked()
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
     
     
 }//class PokerController

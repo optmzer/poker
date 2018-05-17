@@ -2,7 +2,7 @@
  * Attache listener to the cards 
  * Make the controller
  * Add File menu with save load
- * 
+ * Add label to show the bet.
  */
 package poker;
 
@@ -13,8 +13,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.swing.*;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -26,30 +29,68 @@ public class MainViewPanel extends JPanel implements ActionListener{
     private List<Player> players;
     private Hand player0_hand;
     private Hand player1_hand;
-    private final Bank bank;
     private boolean showCards = false;
+   
+//Player 1 card Panel
+    private JPanel cardPanel;
+    private List<JLabel> cardLabels;
     
-    private JPanel controlPanel;
     
+//moneyPanel wallet size of players and pot size.
     private JPanel moneyPanel;
     private JLabel potSize;
     private JLabel p0_wallet;
     private JLabel p1_wallet;
+    
+//Shows betting slider
+    private JPanel bettingPanel;
+    private JSlider bettingSlider;
+    private JLabel bettingValueLabel;
+    private int bettingMax;
+    private int bettingValue = 2; //Minimum bet is $2
 
-
+//Hints about the game
+    private JPanel commentsPanel;
+    private JLabel swap;
+    private JLabel skip;
+    private JLabel bet;
+    private JLabel fold;
     private JLabel comments;
     
-    public MainViewPanel(){
-        bank = new Bank();
-        players = new ArrayList<>();
+    public MainViewPanel(List<Player> players){
+        this.players = players;
+        cardLabels = new ArrayList<>();
         initPanel();
     }
     
     private void initPanel(){
         this.setBackground(Color.green);
         this.setLayout(new BorderLayout());
-        initMoneyPanel();
-        this.add(moneyPanel, BorderLayout.WEST);
+        initMoneyPanel(); //Left
+        initCardsPanel(); //Center;
+        initComentsPanel(); //Bottom
+        //initBettingPanel had to be moved into update hands
+        setPlayers(players);//Must be here to init properly.
+        initBettingPanel();//Right
+    }
+    
+    private void initCardsPanel(){
+        cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 300));
+//        cardPanel.setBackground(Color.GREEN);
+        //init JLabel array
+        for(int i = 0; i < 5; ++i){
+            //Name labels for easier ID
+            JLabel label = new JLabel();
+            label.setName(""+i);
+            cardLabels.add(label);
+        }
+        
+        for(JLabel label: cardLabels){
+            cardPanel.add(label);
+        }
+        cardPanel.setOpaque(false);
+        
+        this.add(cardPanel, BorderLayout.CENTER);
     }
     
     private void initMoneyPanel(){
@@ -71,10 +112,87 @@ public class MainViewPanel extends JPanel implements ActionListener{
         moneyPanel.add(new JLabel(""));
         moneyPanel.add(p1_wallet);
         moneyPanel.add(new JLabel(""));
+        this.add(moneyPanel, BorderLayout.WEST);
 
-    }
+    }//initMoneyPanel()
+    
+    private void initComentsPanel(){
+        commentsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        commentsPanel.setBackground(Color.GREEN);
+        
+        
+        skip = new JLabel();
+        comments = new JLabel();
+        swap = new JLabel();
+        bet = new JLabel();
+        fold = new JLabel();
+        
+        skip.setText("Skip");
+        skip.setName("Skip");
+        swap.setText("Swap");
+        swap.setName("Swap");
+        bet.setText("Bet");
+        bet.setName("Bet");
+        fold.setText("Fold");
+        fold.setName("Fold");
+        comments.setText("Comments and hints here");
+        
+        commentsPanel.add(comments);
+        commentsPanel.add(skip);
+        commentsPanel.add(swap);
+        commentsPanel.add(bet);
+        commentsPanel.add(fold);
+
+        this.add(commentsPanel, BorderLayout.SOUTH);
+    }//initCommentsPanel()
+    
+    private void initBettingPanel(){
+        //set slider values from player wallet
+        bettingValueLabel = new JLabel(String.format("%s % 4d ", "$", this.bettingValue));
+        bettingValueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bettingPanel = new JPanel();
+        bettingPanel.setLayout(new BoxLayout(bettingPanel, BoxLayout.Y_AXIS));
+        bettingPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        bettingPanel.setBackground(Color.green);
+        
+        bettingSlider = new JSlider(JSlider.VERTICAL);
+        bettingSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bettingSlider.setMinimum(2);
+        bettingSlider.setMaximum(bettingMax);
+        bettingSlider.setValue(2);
+        bettingSlider.setMajorTickSpacing(50);
+        bettingSlider.setMinorTickSpacing(2);
+        bettingSlider.setPaintTicks(true);
+        bettingSlider.setPaintLabels(true);
+        bettingSlider.setBackground(Color.green);
+        bettingSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                setBettingValue(bettingSlider.getValue());
+                bettingValueLabel.setText(String.format("%s % 4d ", "$", getBettingValue()));
+//                setBettingValue();
+            }
+        });
+        
+        bettingPanel.add(bettingValueLabel);
+        bettingPanel.add(bettingSlider);
+
+        this.add(bettingPanel, BorderLayout.EAST);
+    }//initBettingPanel()
     
 //    ============ SETTERS/GETTERS ===============
+    
+    private void setBettingValue(int value){
+        this.bettingValue = value;
+    }
+    
+    public int getBettingValue(){
+        return this.bettingValue;
+    }
+    
+    private void setBettingMax(int max){
+        this.bettingMax = max;
+    }
     
     private void setHandImages(Hand hand){
         for (Card aCard : hand) {
@@ -85,8 +203,21 @@ public class MainViewPanel extends JPanel implements ActionListener{
             }
         }
     }
-
+    
+    private void setLabelImages(){
+        for(int i = 0; i < player1_hand.size(); ++i){
+            try {
+                ImageIcon icon = new ImageIcon();
+                icon.setImage(ImageIO.read(new File(imgURL + player1_hand.getCard(i) + ".png")));
+                cardLabels.get(i).setIcon(icon);
+            } catch (IOException ex) {
+                System.out.println("File does not exist = " + imgURL + player1_hand.getCard(i).toString() + ".png");
+            }
+        }
+    }
+    
     public void setPlayers(List<Player> players){
+//       initBettingPanel();
        this.players = players;
        for(Player player: players){
            setPlayerWallet(player);
@@ -98,6 +229,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
             p0_wallet.setText("     Kelly $ " + player.getWallet());
         }else{
             p1_wallet.setText("     Your $ " + player.getWallet());
+            setBettingMax(player.getWallet());
         }
     }
     
@@ -114,6 +246,31 @@ public class MainViewPanel extends JPanel implements ActionListener{
         
         repaint();
 //        System.out.println("L116 MainViewPanel View Updated");
+    }//setPotSize()
+    
+    public void setComments(String comments){
+        this.comments.setText(comments);
+        repaint();
+    }
+    
+    public JLabel getSwapLabel(){
+        return this.swap;
+    }
+    
+    public JLabel getSkipLabel(){
+        return this.skip;
+    }
+    
+    public JLabel getBetLabel(){
+        return this.bet;
+    }
+    
+    public JLabel getFoldLabel(){
+        return this.fold;
+    }
+    
+    public List<JLabel> getCardLabels(){
+        return this.cardLabels;
     }
     
     @Override
@@ -123,20 +280,29 @@ public class MainViewPanel extends JPanel implements ActionListener{
 //        g.setColor(Color.GREEN); //Sets color of the font to green
             //Player 0 cards shirt up.
             if(showCards){
-                drawPlayerCards(player0_hand, 200, 40, g);
-                drawPlayerCards(player1_hand, 200, 350, g);
+                drawCards(player0_hand, 200, 40, g);
+//                drawCards(player1_hand, 200, 350, g);
             }else{
                 drawCardShirts(g);
-                drawPlayerCards(player1_hand, 200, 350, g);
+//                drawCards(player1_hand, 200, 350, g);
             }
             //player 1 cards face up
     }  
      
-    private void drawPlayerCards(Hand hand,int x, int y, Graphics g){
+    private void drawCards(Hand hand,int x, int y, Graphics g){
+        
         System.out.println("Player 1 = " + hand);
         for(Card aCard: hand){
             g.drawImage(aCard.getCardImage(), x, y, this);
             x += 90;
+        }
+    }
+    
+    private void drawPlayerCards(Hand hand, int x, int y){
+        for(JLabel label: cardLabels){
+            label.setLocation(x, y);
+            x += 90;
+            this.add(label);
         }
     }
      
@@ -166,8 +332,9 @@ public class MainViewPanel extends JPanel implements ActionListener{
             this.player0_hand = player.getHand();
         }else{
             this.player1_hand = player.getHand();
+            setLabelImages();
+            setBettingMax(player.getWallet());
         }
-        
     }//updatePlayerHand()
      
    
