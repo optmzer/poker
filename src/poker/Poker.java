@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 public class Poker {
 
     private static PokerController controller;
-    private static Bank bank;
+//    private static Bank bank;
     /**
      * @param args the command line arguments
      */
@@ -25,8 +25,8 @@ public class Poker {
         SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    bank = new Bank();
-                    controller = new PokerController(bank, new MainViewPanel(bank.getPlayers()));
+//                    bank = new Bank();
+                    controller = new PokerController();
                 }
             }
         ); 

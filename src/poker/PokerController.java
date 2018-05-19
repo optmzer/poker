@@ -11,6 +11,9 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -19,9 +22,11 @@ import javax.swing.*;
  */
 public class PokerController extends JFrame implements ActionListener, MouseListener{
     
-    private final Bank bank;
+    private Bank bank;
+    private Timer timeDelay;
+    private boolean secondRound = false;
     
-    private final MainViewPanel pokerView;
+    private final MainViewPanel view;
     private JMenuBar menuBar;
     private JMenu menuFile;
     private JMenuItem newGame;
@@ -29,11 +34,13 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     private JMenuItem loadGame;
     private JMenuItem exitGame;
 
+    //Game variables
+    private Enum betType;
 
-    public PokerController(Bank bank, MainViewPanel view){
+    public PokerController(){
         super("Poker");
-        this.bank = bank;
-        this.pokerView = view;
+        this.bank = new Bank();
+        this.view = new MainViewPanel(bank.getPlayers());
         initFrame();
         startGame();
     }
@@ -51,10 +58,9 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         //Set screen position in the center of the screen
         this.setLocation((screenSize.width * 1 / 6), (screenSize.height * 1 / 8));
         
-        this.add(pokerView);
+        this.add(view);
         this.setJMenuBar(menuBar);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        this.pack();// this makes it as compact as possible
         this.setVisible(true);
         this.setResizable(false);
         
@@ -93,33 +99,23 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     }//initMenuBar()
     
     private void attachActionListeners(){
-        for(JLabel label: pokerView.getCardLabels()){
+        for(JLabel label: view.getCardLabels()){
             label.addMouseListener(this);
         }
-        pokerView.getSkipLabel().addMouseListener(this);
-        pokerView.getSwapLabel().addMouseListener(this);
-        pokerView.getBetLabel().addMouseListener(this);
-        pokerView.getFoldLabel().addMouseListener(this);
+        view.getSkipLabel().addMouseListener(this);
+        view.getSwapLabel().addMouseListener(this);
+        view.getRiseLabel().addMouseListener(this);
+        view.getFoldLabel().addMouseListener(this);
+        view.getCallLabel().addMouseListener(this);
     }//attachActionListeners()
     
     
 //    ============================ GAME LOGIC ==============================
 
     private void startGame(){
-    
-//        showStartMenu();
-            bank.dealNewRound();
-            pokerView.setPlayers(bank.getPlayers());
-            showHands(false);
-//                Once game has started it loops around till player quits through menu
-
-                            //game logic
-//                          1 - Dial cards
-                            showCards();
-                            showPlayersBallance();
-//                            getPlayerFeedback
-//                          2 - First Round of Betting
-//                            if(BetType.FOLD == showFoldCallRise()){
+        gameInitScreen();
+                            
+//                            if(BetType.FOLD == this.betType){
 //                                showWinners();
 //                                showPlayersBallance();
 ////                                break;
@@ -140,116 +136,86 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 //                            showWinners();
 //                            showPlayersBallance();
                             
-//                        case 2:
-                            //open prev game if it exist
-//                            showLoadGameDialog();
-                            //Return message if file does not exist saying 
-                            //the slot is empty.
-                            //if not offer a message to make one.
-//                            user_input = 3; //They might want to carry on playing
-                            
-//                        case 3:
-                            //open prev game if it exist
-//                            showSaveGameDialog();
-                            //if not offer a message to make one.
-//                            user_input = 3; //They might want to carry on playing
-                             
 
     }//startGame()
     
+    private void gameInitScreen(){
+        this.secondRound = false;
+        bank.dealNewRound();
+        view.updateView(bank.getPlayers());
+        view.setPotSize(0);
+        view.resetSlider();
+        showHands(false);
+            
+//      Once game has started it loops around till player quits through menu
+//      game logic
+//      1 - Dial cards
+        showCards();
+        showPlayersBallance();
+//      getPlayerFeedback
+//      2 - First Round of Betting
+        showRiseCallFold();
+    }
         
-    
+    public void setBetType(BetType betType){
+        this.betType = betType;
+    }
     
     public void showCards(){
         for(Player player: bank.getPlayers()){
-            pokerView.updateHand(player);
+            view.updateHand(player);
         }
     }//showHands()
     
     private void showPlayersBallance(){
         for(Player player: bank.getPlayers()){
-            pokerView.setPlayerWallet(player);
+            view.setPlayerWallet(player);
             System.out.print("     " + player.getPlayerType() + ": $" + player.getWallet());
         }
     }
     
-    public void showHands(boolean show){
-        pokerView.showCards(show);
+    public void showHands(boolean b){
+        view.showCards(b);
     }
     
-    private BetType showFoldCallRise(){
-        String line = "";
-        int userInput = 0;
+    private void showRiseCallFold(){
         //get user input 1, 2 or 3
-        do{
-            System.out.println("Press (1) - Rise");
-            System.out.println("Press (2) - Call");
-            System.out.println("Press (3) - Fold");
-            System.out.print(">");
-            try{
-//                line = scan.nextLine();
-                userInput = Integer.parseInt(line);
-                if(userInput != 1 && userInput != 2 && userInput != 3){
-                    System.out.println("You entered > " + userInput);
-                    System.out.println("Please enter a nmber from 1 to 3");
-                }
-            }catch(NumberFormatException e){
-                System.out.println("You entered > " + line);
-                System.out.println("Please enter a nmber from 1 to 3");
-            }
-            
-        }while(userInput != 1 && userInput != 2 && userInput != 3);
-
-            System.out.println("  ============================================");
-            
-            switch(userInput){
-                case 1://Rise
-                    showMakeBet(BetType.RISE);
-                    return BetType.RISE;
-                case 2://Call
-                    showMakeBet(BetType.CALL);
-                    return BetType.CALL;
-                default://Fold
-                    bank.playerFold(PlayerType.PLAYER_1);
-                    return BetType.FOLD;
-            }
+        view.setEnabledSkipSwap(false);
+        view.setEnabledRiseFoldCall(true);
+        view.setEnabledSlider(true);
+        view.setComments("You can Rise, Call or Fold. How much do you want to bet?");
     }//showFoldCallRise()
 
     private void showMakeBet(BetType betType){
-        int betAmount = 0;
+        int betAmount;
         int minimumBet = 2;
         boolean hasEnoughToBet = false; 
         Player computer = bank.getPlayer(PlayerType.COMPUTER);
         Player player1 = bank.getPlayer(PlayerType.PLAYER_1);
         
         //Fold Call Rise
-        
-        System.out.println("How much do you want to bet? You got: $" + player1.getWallet());
-
         if(null == betType){
             
         }else switch (betType) {
             case RISE:
-                //Repeat input untill get the amount
-                do{
-                    System.out.print("bet $ > ");//Prompt.
-                    try{
-//                        betAmount = Integer.parseInt(scan.nextLine());
-                        hasEnoughToBet = player1.ableToBet(betAmount);
-                        if(hasEnoughToBet && betAmount >= minimumBet){
-                            //bank record the potSize.
-                            bank.addToPot(player1.rise(betAmount));
-                            //Make computer bet same as player for now.
-                            bank.addToPot(computer.rise(betAmount));
-                        }else if(betAmount < minimumBet){
-                            System.out.println("\n Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
-                        }else{
-                            System.out.println("\n" + player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
-                        }
-                    }catch(NumberFormatException e){
-                        System.out.println("Please type in bet amount. \nRules of the house. Bet cannot be lower than 2");
-                    }
-                }while(!(hasEnoughToBet && betAmount >= minimumBet));
+                betAmount = view.getBettingValue();
+                hasEnoughToBet = player1.ableToBet(betAmount);
+                if(hasEnoughToBet && betAmount >= minimumBet){
+                    //bank record the potSize.
+                    bank.addToPot(player1.rise(betAmount));
+                    //Make computer bet same as player for now.
+                    bank.addToPot(computer.rise(betAmount));
+                    
+                }else if(betAmount < minimumBet){
+                    view.setComments("Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
+                }else{
+                    view.setComments(player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
+                }
+                
+                view.setPotSize(bank.getPot());
+                view.updateView(bank.getPlayers());
+                showOfferCardSwap();
+
                 break;
             case CALL:
                 /*
@@ -266,19 +232,21 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                     System.out.println("\n Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
                 }else{
                     System.out.println("\n" + player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
-                }   break;
+                }   
+                
+                view.setPotSize(bank.getPot());
+                view.updateView(bank.getPlayers());
+
+                showOfferCardSwap();
+                break;
             default:
                 //Fold
                 //give up the Pot.
                 break;
         }
-
-        System.out.println("  ============ POT SIZE $" + bank.getPot() + " ============");
-        
-        System.out.println(player1.getPlayerType() + " have $" + player1.getWallet() + " left");
-        System.out.println(computer.getPlayerType() + " has  $" + computer.getWallet() + " left");
-        System.out.println("  ============================================");
-
+        view.resetSlider();
+        view.disableControls();
+        view.setEnabledSkipSwap(true);
     }//showMakeBet()
     
     
@@ -291,17 +259,16 @@ public class PokerController extends JFrame implements ActionListener, MouseList
      */
     private void showOfferCardSwap(){
         List<Integer> cardIndexes = new ArrayList<>();
-        Hand player1_hand;
+//        Hand player1_hand;
         
         int swapLimit = 3;
         
-        System.out.print("What cards do you want to swap? ");
         //Up to 3 cards. If has an Ace can swap up untill 4.
         //make a while loop for swapping and evaluating.
         for(Player aPlayer : bank.getPlayers()){
             if(aPlayer.getPlayerType() == PlayerType.PLAYER_1){
                 //Get player 1 hand while we are at it.
-                player1_hand = aPlayer.getHand();
+//                player1_hand = aPlayer.getHand();
                 for (Card aCard : aPlayer.getHand()) {
                     if(aCard.getRank() == CardRank.ACE){
                         swapLimit = 4;
@@ -310,7 +277,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
             }
         }//for
         
-        System.out.println("You can swap up to " + swapLimit + " cards");
+        view.setComments("What cards do you want to swap? You can swap up to " + swapLimit + " cards");
         
         //pass cardIndexes to the bank for swapping.
         if(!cardIndexes.isEmpty()){
@@ -324,7 +291,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                                 
         if(winners.size() > 1){
             //there are 2 winners
-            System.out.println("L326 It is split :");
+            view.setComments("The pot is split.");
 //            System.out.println("\nL327 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
 //            System.out.println("\nL328 Poker: The winner is: " + winners.get(1).getPlayerType() + " with " + winners.get(1).getHand().getHandType());
             //Add split to computer and player1
@@ -333,47 +300,86 @@ public class PokerController extends JFrame implements ActionListener, MouseList
             winners.get(0).addToWallet(split);
             winners.get(1).addToWallet(split);
         }else{
-            System.out.println("\nL334 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
+            view.setComments("The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());
+
             //Add split to computer and player1
             winners.get(0).addToWallet(bank.getPot());
         }
+        view.updateView(bank.getPlayers());
         this.showHands(true);
+        view.disableControls();
+        
+        //resetSlider is in showWinners
+        //And starts new game
+        timeDelay = new Timer(5000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGame();
+            }
+        });
+        timeDelay.setRepeats(false);
+        timeDelay.start();
     }//showTwoWinners()
     
-//    ============================== HANDLERS ==============================
- 
     
+    
+//    ============================== HANDLERS ==============================
+//TODO: I think I have to use handlers to make the game run properly.
+    //They will be switching the screens.
+    
+    private void handleCardSelect(){
+        
+    }
+    
+    private void handleRiseCallFold(BetType type){
+        
+        if(BetType.FOLD != type){
+            showMakeBet(type);
+        }else{
+            bank.playerFold(PlayerType.PLAYER_1);
+            showWinners();
+        }
+        if(secondRound){
+            showWinners();
+            
+        }
+        
+//      Sets flag that the method already run at least once
+        secondRound = true;
+    }
+    
+    private void handleSwapSkip(){
+        //If skip do show second round of betting
+        
+        //if swap - obtaincards to swap card and second round of betting
+        showRiseCallFold();
+    }
     
     
 //    ============================== ACTIONS ==============================
-    public void showLoadGameDialog(){
-        //2 - Load game from the file
-        //Or return message to say that file not found or does not exist yet.
-       
-    }
-    
-    public void showSaveGameDialog(){
-        // 3 - Save to file
         
-    }
     @Override
     public void actionPerformed(ActionEvent e) {
 //        System.out.println("Event = " + e);
         String cmd = e.getActionCommand();
         
         if(cmd.equals("New Game")){
+            bank = new Bank();
             startGame();
             //update view
-            pokerView.updateView(bank.getPlayers());
+            view.resetSlider();
+            view.updateView(bank.getPlayers());
         }
         if(cmd.equals("Save Game")){
             bank.saveGame();
             //update info label on view
+            view.setComments("Your game was saved.");
         }
         if(cmd.equals("Load Game")){
             bank.loadGame();
             //update wallets and the view
-            pokerView.updateView(bank.getPlayers());
+            view.resetSlider();
+            view.updateView(bank.getPlayers());
         }
         
         if(cmd.equals("Exit")){
@@ -386,7 +392,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Object source = e.getSource();
+//        Object source = e.getSource();
         String card = e.getComponent().getName();
         switch(card){
             case "0":
@@ -407,23 +413,41 @@ public class PokerController extends JFrame implements ActionListener, MouseList
             default:
         }
         
+//        System.out.println("Event = " + e.getComponent().isEnabled());
+        
         String actionLabel = e.getComponent().getName();
-        if(actionLabel.equalsIgnoreCase("Skip")){
+        if(actionLabel.equalsIgnoreCase("Skip") && e.getComponent().isEnabled()){
             System.out.println("Skip was pressed");
             //Skip cards swap or betting 
+            
+            handleSwapSkip();
+//            showRiseCallFold();
+//            showWinners();
+//            //Offer a button to start new game.
+//            //Or write timer.
+//            
         }
-        if(actionLabel.equalsIgnoreCase("Swap")){
+        if(actionLabel.equalsIgnoreCase("Swap") && e.getComponent().isEnabled()){
             System.out.println("Swap was pressed");
             //Swap cards
+            handleSwapSkip();
         }
         
-        if(actionLabel.equalsIgnoreCase("Bet")){
-            System.out.println("Bet was pressed");
+        if(actionLabel.equalsIgnoreCase("Rise") && e.getComponent().isEnabled()){
+            System.out.println("Rise was pressed");
+            handleRiseCallFold(BetType.RISE);
             //Place bet if enough money
         }
         
-        if(actionLabel.equalsIgnoreCase("Fold")){
+        if(actionLabel.equalsIgnoreCase("Call") && e.getComponent().isEnabled()){
+            System.out.println("Call was pressed");
+            handleRiseCallFold(BetType.CALL);
+            //Place bet if enough money
+        }
+        
+        if(actionLabel.equalsIgnoreCase("Fold") && e.getComponent().isEnabled()){
             System.out.println("Fold was pressed");
+            handleRiseCallFold(BetType.FOLD);
             //Place bet if enough money
         }
     }//mouseClicked()

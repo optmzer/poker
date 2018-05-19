@@ -51,9 +51,13 @@ public class MainViewPanel extends JPanel implements ActionListener{
 
 //Hints about the game
     private JPanel commentsPanel;
+    
+//    Control panel 
+    private JPanel controlsPanel;
     private JLabel swap;
     private JLabel skip;
-    private JLabel bet;
+    private JLabel rise;
+    private JLabel call;
     private JLabel fold;
     private JLabel comments;
     
@@ -118,32 +122,42 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
     private void initComentsPanel(){
         commentsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        commentsPanel.setBorder(BorderFactory.createEmptyBorder(5,10,5,10));
         commentsPanel.setBackground(Color.GREEN);
         
+        controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        controlsPanel.setBorder(BorderFactory.createEmptyBorder(5,10,5,10));
+        controlsPanel.setBackground(Color.GREEN);
         
-        skip = new JLabel();
         comments = new JLabel();
+        skip = new JLabel();
         swap = new JLabel();
-        bet = new JLabel();
+        rise = new JLabel();
+        call = new JLabel();
         fold = new JLabel();
-        
+        //Card swap
         skip.setText("Skip");
         skip.setName("Skip");
         swap.setText("Swap");
         swap.setName("Swap");
-        bet.setText("Bet");
-        bet.setName("Bet");
+        
+        //Betting
+        rise.setText("Rise");
+        rise.setName("Rise");
+        call.setText("Call");
+        call.setName("Call");
         fold.setText("Fold");
         fold.setName("Fold");
-        comments.setText("Comments and hints here");
         
         commentsPanel.add(comments);
-        commentsPanel.add(skip);
-        commentsPanel.add(swap);
-        commentsPanel.add(bet);
-        commentsPanel.add(fold);
+        controlsPanel.add(skip);
+        controlsPanel.add(swap);
+        controlsPanel.add(rise);
+        controlsPanel.add(call);
+        controlsPanel.add(fold);
 
-        this.add(commentsPanel, BorderLayout.SOUTH);
+        this.add(commentsPanel, BorderLayout.NORTH);
+        this.add(controlsPanel, BorderLayout.SOUTH);
     }//initCommentsPanel()
     
     private void initBettingPanel(){
@@ -182,6 +196,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
 //    ============ SETTERS/GETTERS ===============
     
+       
     private void setBettingValue(int value){
         this.bettingValue = value;
     }
@@ -261,12 +276,37 @@ public class MainViewPanel extends JPanel implements ActionListener{
         return this.skip;
     }
     
-    public JLabel getBetLabel(){
-        return this.bet;
+    public JLabel getRiseLabel(){
+        return this.rise;
+    }
+    
+    public JLabel getCallLabel(){
+        return this.call;
     }
     
     public JLabel getFoldLabel(){
         return this.fold;
+    }
+    
+    public void setEnabledRiseFoldCall(boolean b){
+        this.rise.setEnabled(b);
+        this.call.setEnabled(b);
+        this.fold.setEnabled(b);
+    }
+    
+    public void setEnabledSkipSwap(boolean b) {
+        this.skip.setEnabled(b);
+        this.swap.setEnabled(b);
+    }
+    
+    public void setEnabledSlider(boolean b){
+        this.bettingSlider.setEnabled(b);
+    }
+    
+    public void disableControls(){
+        this.setEnabledRiseFoldCall(false);
+        this.setEnabledSkipSwap(false);
+        this.setEnabledSlider(false);
     }
     
     public List<JLabel> getCardLabels(){
@@ -280,7 +320,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
 //        g.setColor(Color.GREEN); //Sets color of the font to green
             //Player 0 cards shirt up.
             if(showCards){
-                drawCards(player0_hand, 200, 40, g);
+                drawCards(player0_hand, 230, 50, g);
 //                drawCards(player1_hand, 200, 350, g);
             }else{
                 drawCardShirts(g);
@@ -294,20 +334,20 @@ public class MainViewPanel extends JPanel implements ActionListener{
         System.out.println("Player 1 = " + hand);
         for(Card aCard: hand){
             g.drawImage(aCard.getCardImage(), x, y, this);
-            x += 90;
+            x += 93;
         }
     }
     
     private void drawPlayerCards(Hand hand, int x, int y){
         for(JLabel label: cardLabels){
             label.setLocation(x, y);
-            x += 90;
+            x += 93;
             this.add(label);
         }
     }
      
     private void drawCardShirts(Graphics g){
-        int player0_x = 200;
+        int player0_x = 230;
         int player0_y = 50;
         Image cardShirt = null;
         try {
@@ -317,7 +357,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
         for(Card card: player0_hand){
             g.drawImage(cardShirt, player0_x, player0_y, this);
-            player0_x += 90;
+            player0_x += 93;
         }
     } 
     
@@ -344,5 +384,11 @@ public class MainViewPanel extends JPanel implements ActionListener{
         System.out.println("L92 MainViewPanel action registered = " + e.getSource());
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    void resetSlider() {
+        this.bettingSlider.setValue(2);
+        setBettingValue(2);
+    }
+
+       
 }//class
