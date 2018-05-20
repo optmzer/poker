@@ -208,7 +208,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
     private void setBettingMax(int max){
         this.bettingMax = max;
     }
-    
+    //This sets img for Computer hand
     private void setHandImages(Hand hand){
         for (Card aCard : hand) {
             try {
@@ -250,6 +250,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
     public void setPotSize(int pot){
         this.potSize.setText("     Pot $ " + pot);
+    }
+    
+    public void updateView(){
+        updateView(this.players);
     }
     
     public void updateView(List<Player> players){
@@ -313,6 +317,24 @@ public class MainViewPanel extends JPanel implements ActionListener{
         return this.cardLabels;
     }
     
+    public void setCardLabelBorder(String labelName){
+        for(JLabel cardLabel: this.cardLabels){
+            if(labelName.equalsIgnoreCase(cardLabel.getName())){
+//                cardLabel.setBorder(BorderFactory.createLineBorder(Color.yellow, 3, true));
+                cardLabel.setEnabled(false);
+            }
+        }
+    }//setCardLableBorder()
+    
+    public void removeCardLabelBorder(String labelName){
+        for(JLabel cardLabel: this.cardLabels){
+            if(labelName.equalsIgnoreCase(cardLabel.getName())){
+//                cardLabel.setBorder(BorderFactory.createLineBorder(Color.green, 0, false));
+                cardLabel.setEnabled(true);
+            }
+        }
+    }//setCardLableBorder()
+    
     @Override
      public void paintComponent(Graphics g) {
         super.paintComponent(g);       
@@ -338,13 +360,13 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }
     
-    private void drawPlayerCards(Hand hand, int x, int y){
-        for(JLabel label: cardLabels){
-            label.setLocation(x, y);
-            x += 93;
-            this.add(label);
-        }
-    }
+//    private void drawPlayerCards(Hand hand, int x, int y){
+//        for(JLabel label: cardLabels){
+//            label.setLocation(x, y);
+//            x += 93;
+//            this.add(label);
+//        }
+//    }
      
     private void drawCardShirts(Graphics g){
         int player0_x = 230;
@@ -367,7 +389,7 @@ public class MainViewPanel extends JPanel implements ActionListener{
         
     
     public void updateHand(Player player){
-        setHandImages(player.getHand());
+        setHandImages(player.getHand()); //This sets img for Computer hand
         if(player.getPlayerType() == PlayerType.COMPUTER){
             this.player0_hand = player.getHand();
         }else{
@@ -388,6 +410,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
     void resetSlider() {
         this.bettingSlider.setValue(2);
         setBettingValue(2);
+    }
+
+    void enableCardLabels() {
+        this.cardLabels.forEach(card -> card.setEnabled(true));
     }
 
        

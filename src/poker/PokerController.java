@@ -10,10 +10,9 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.swing.*;
 
 /**
@@ -35,7 +34,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     private JMenuItem exitGame;
 
     //Game variables
-    private Enum betType;
+    private List<String> swapList;
 
     public PokerController(){
         super("Poker");
@@ -113,6 +112,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 //    ============================ GAME LOGIC ==============================
 
     private void startGame(){
+        swapList = new ArrayList<>();
         gameInitScreen();
                             
 //                            if(BetType.FOLD == this.betType){
@@ -157,9 +157,9 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         showRiseCallFold();
     }
         
-    public void setBetType(BetType betType){
-        this.betType = betType;
-    }
+//    public void setBetType(BetType betType){
+//        this.betType = betType;
+//    }
     
     public void showCards(){
         for(Player player: bank.getPlayers()){
@@ -252,38 +252,11 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
     
     /**
-     * Get input from the user and pass this input to bank.swapCards()
-     * @param bank
-     * @param scan
-     * @return 
+     * 
+     * 
      */
     private void showOfferCardSwap(){
-        List<Integer> cardIndexes = new ArrayList<>();
-//        Hand player1_hand;
-        
-        int swapLimit = 3;
-        
-        //Up to 3 cards. If has an Ace can swap up untill 4.
-        //make a while loop for swapping and evaluating.
-        for(Player aPlayer : bank.getPlayers()){
-            if(aPlayer.getPlayerType() == PlayerType.PLAYER_1){
-                //Get player 1 hand while we are at it.
-//                player1_hand = aPlayer.getHand();
-                for (Card aCard : aPlayer.getHand()) {
-                    if(aCard.getRank() == CardRank.ACE){
-                        swapLimit = 4;
-                    }
-                }
-            }
-        }//for
-        
-        view.setComments("What cards do you want to swap? You can swap up to " + swapLimit + " cards");
-        
-        //pass cardIndexes to the bank for swapping.
-        if(!cardIndexes.isEmpty()){
-            bank.swopCards(PlayerType.PLAYER_1, cardIndexes);
-        }
-
+        view.setComments("What cards do you want to swap? You can swap up to " + bank.getSwapLimit(PlayerType.PLAYER_1) + " cards");
     }//showOfferCardSwap()
     
     private void showWinners(){
@@ -324,12 +297,37 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
     
 //    ============================== HANDLERS ==============================
-//TODO: I think I have to use handlers to make the game run properly.
+//TODO: Make card swap working.
     //They will be switching the screens.
     
-    private void handleCardSelect(){
+    private void handleCardSelect(MouseEvent e){
+
+        String cardName = e.getComponent().getName();
+        if(!swapList.isEmpty() && !e.getComponent().isEnabled()){
+//          enable cardLabel
+            view.removeCardLabelBorder(cardName);
+//            remove from swap list
+            this.swapList.remove(cardName);
+        }else{
+//          disable cardLabel
+            view.setCardLabelBorder(cardName);
+//            add to swap list
+            this.swapList.add(cardName);
+        }
+        System.out.println("swapList.size() = " + swapList.size());
+        //If selected more then allowed remove previouse card
+        if(!swapList.isEmpty() && swapList.size() > bank.getSwapLimit(PlayerType.PLAYER_1)){
+            int prevCardIndex = bank.getSwapLimit(PlayerType.PLAYER_1) - 1;
+            view.removeCardLabelBorder("" + swapList.get(prevCardIndex));
+            swapList.remove(bank.getSwapLimit(PlayerType.PLAYER_1) - 1);
+            System.out.println("Remove prev card " + (prevCardIndex));
+        }
+        this.swapList.forEach((value) -> {
+            System.out.print(value + ", " );
+        });
+        System.out.println("");
         
-    }
+    }//handleCardSelect()
     
     private void handleRiseCallFold(BetType type){
         
@@ -348,10 +346,30 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         secondRound = true;
     }
     
-    private void handleSwapSkip(){
+    private void handleSwapSkip(String action){
+        List<Integer> cardIndexes = new ArrayList<>();
+        
+        switch(action){
+        //if swap - obtain cards to swap card and second round of betting
+            case "Swap":
+                //Conert Strings into Integers
+                if(!swapList.isEmpty()){
+                    for(String name: swapList){
+                        cardIndexes.add(Integer.parseInt(name));
+                    }
+                }
+
+                //pass cardIndexes to the bank for swapping.
+                if(!cardIndexes.isEmpty()){
+                    bank.swopCards(PlayerType.PLAYER_1, cardIndexes);
+                    view.updateView();
+                    view.enableCardLabels();
+                }
+                break;
+            default://default is skip
+        }
         //If skip do show second round of betting
         
-        //if swap - obtaincards to swap card and second round of betting
         showRiseCallFold();
     }
     
@@ -392,25 +410,37 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        Object source = e.getSource();
         String card = e.getComponent().getName();
-        switch(card){
+        //If swap !isEnabled() do not register clicks
+        if(!view.getSwapLabel().isEnabled()){
+            
+        }else switch(card){
             case "0":
                 System.out.println("Card 0");
+                handleCardSelect(e);
                 break;
             case "1":
                 System.out.println("Card 1");
+                handleCardSelect(e);
+
                 break;
             case "2":
                 System.out.println("Card 2");
+                handleCardSelect(e);
+
                 break;
             case "3":
                 System.out.println("Card 3");
+                handleCardSelect(e);
+
                 break;
             case "4":
                 System.out.println("Card 4");
+                handleCardSelect(e);
+
                 break;
             default:
+                
         }
         
 //        System.out.println("Event = " + e.getComponent().isEnabled());
@@ -420,7 +450,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
             System.out.println("Skip was pressed");
             //Skip cards swap or betting 
             
-            handleSwapSkip();
+            handleSwapSkip("Skip");
 //            showRiseCallFold();
 //            showWinners();
 //            //Offer a button to start new game.
@@ -430,7 +460,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         if(actionLabel.equalsIgnoreCase("Swap") && e.getComponent().isEnabled()){
             System.out.println("Swap was pressed");
             //Swap cards
-            handleSwapSkip();
+            handleSwapSkip("Swap");
         }
         
         if(actionLabel.equalsIgnoreCase("Rise") && e.getComponent().isEnabled()){

@@ -215,6 +215,22 @@ public class Bank {
         return winning_list;
     }//getWinner()
     
+    public int getSwapLimit(PlayerType playerType){
+        int swapLimit = 3;
+        //Up to 3 cards. If has an Ace can swap up untill 4.
+        //make a while loop for swapping and evaluating.
+        for(Player aPlayer : getPlayers()){
+            if(aPlayer.getPlayerType() == playerType){
+                for (Card aCard : aPlayer.getHand()) {
+                    if(aCard.getRank() == CardRank.ACE){
+                        swapLimit = 4;
+                    }
+                }
+            }
+        }//for
+        return swapLimit;
+    }//swapLimit()
+    
     /**
      * 
      */
