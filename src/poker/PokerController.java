@@ -1,8 +1,7 @@
 /**
- * TODO: It does not need to implement Listener
- * but it needs to provide access to Frame elements.
- * Make EXIT button/label visible from the panel
- * on Window open start new game.
+ * TODO: Glitch. When folding cards it shows split message
+ * and adds double the pot size to computer.
+ * Subtract correctly from player 1.
  */
 package poker;
 
@@ -170,7 +169,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     private void showPlayersBallance(){
         for(Player player: bank.getPlayers()){
             view.setPlayerWallet(player);
-            System.out.print("     " + player.getPlayerType() + ": $" + player.getWallet());
+//            System.out.print("     " + player.getPlayerType() + ": $" + player.getWallet());
         }
     }
     
@@ -229,9 +228,11 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                     //Make computer bet same as player for now.
                     bank.addToPot(computer.rise(betAmount));
                 }else if(betAmount < minimumBet){
-                    System.out.println("\n Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
+//                    System.out.println("\n Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
+                    view.setComments("Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
                 }else{
-                    System.out.println("\n" + player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
+//                    System.out.println("\n" + player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
+                    view.setComments(player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
                 }   
                 
                 view.setPotSize(bank.getPot());
@@ -265,16 +266,13 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         if(winners.size() > 1){
             //there are 2 winners
             view.setComments("The pot is split.");
-//            System.out.println("\nL327 Poker: The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());          
-//            System.out.println("\nL328 Poker: The winner is: " + winners.get(1).getPlayerType() + " with " + winners.get(1).getHand().getHandType());
-            //Add split to computer and player1
             
+            //Add split to computer and player1
             int split = bank.splitPot(winners.size());
             winners.get(0).addToWallet(split);
             winners.get(1).addToWallet(split);
         }else{
             view.setComments("The winner is: " + winners.get(0).getPlayerType() + " with " + winners.get(0).getHand().getHandType());
-
             //Add split to computer and player1
             winners.get(0).addToWallet(bank.getPot());
         }
@@ -292,12 +290,12 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         });
         timeDelay.setRepeats(false);
         timeDelay.start();
-    }//showTwoWinners()
+    }//showWinners()
     
     
     
 //    ============================== HANDLERS ==============================
-//TODO: Make card swap working.
+//TODO:
     //They will be switching the screens.
     
     private void handleCardSelect(MouseEvent e){
@@ -314,18 +312,18 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 //            add to swap list
             this.swapList.add(cardName);
         }
-        System.out.println("swapList.size() = " + swapList.size());
+//        System.out.println("swapList.size() = " + swapList.size());
         //If selected more then allowed remove previouse card
         if(!swapList.isEmpty() && swapList.size() > bank.getSwapLimit(PlayerType.PLAYER_1)){
             int prevCardIndex = bank.getSwapLimit(PlayerType.PLAYER_1) - 1;
             view.removeCardLabelBorder("" + swapList.get(prevCardIndex));
             swapList.remove(bank.getSwapLimit(PlayerType.PLAYER_1) - 1);
-            System.out.println("Remove prev card " + (prevCardIndex));
+//            System.out.println("Remove prev card " + (prevCardIndex));
         }
-        this.swapList.forEach((value) -> {
-            System.out.print(value + ", " );
-        });
-        System.out.println("");
+//        this.swapList.forEach((value) -> {
+//            System.out.print(value + ", " );
+//        });
+//        System.out.println("");
         
     }//handleCardSelect()
     
@@ -337,9 +335,10 @@ public class PokerController extends JFrame implements ActionListener, MouseList
             bank.playerFold(PlayerType.PLAYER_1);
             showWinners();
         }
-        if(secondRound){
+        //Without BetType check if it is second betting this part will 
+        //trigger showWinners doubling the amount of win to the Computer.
+        if(secondRound && BetType.FOLD != type){
             showWinners();
-            
         }
         
 //      Sets flag that the method already run at least once
@@ -355,7 +354,8 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                 //Conert Strings into Integers
                 if(!swapList.isEmpty()){
                     for(String name: swapList){
-                        cardIndexes.add(Integer.parseInt(name));
+                        //+1 because swopCards does -1.
+                        cardIndexes.add(Integer.parseInt(name) + 1);
                     }
                 }
 
@@ -371,7 +371,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         //If skip do show second round of betting
         
         showRiseCallFold();
-    }
+    }//handleSwapSkip()
     
     
 //    ============================== ACTIONS ==============================
@@ -415,68 +415,49 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         if(!view.getSwapLabel().isEnabled()){
             
         }else switch(card){
-            case "0":
-                System.out.println("Card 0");
+            case "0"://cardLabel 0
                 handleCardSelect(e);
                 break;
-            case "1":
-                System.out.println("Card 1");
+            case "1"://cardLabel 1
                 handleCardSelect(e);
-
                 break;
-            case "2":
-                System.out.println("Card 2");
+            case "2"://cardLabel 2
                 handleCardSelect(e);
-
                 break;
-            case "3":
-                System.out.println("Card 3");
+            case "3"://cardLabel 3
                 handleCardSelect(e);
-
                 break;
-            case "4":
-                System.out.println("Card 4");
+            case "4"://cardLabel 4
                 handleCardSelect(e);
-
                 break;
             default:
-                
+            //leave empty as every other event will pass through here
+                break;
         }
         
 //        System.out.println("Event = " + e.getComponent().isEnabled());
         
         String actionLabel = e.getComponent().getName();
         if(actionLabel.equalsIgnoreCase("Skip") && e.getComponent().isEnabled()){
-            System.out.println("Skip was pressed");
             //Skip cards swap or betting 
-            
             handleSwapSkip("Skip");
-//            showRiseCallFold();
-//            showWinners();
-//            //Offer a button to start new game.
-//            //Or write timer.
-//            
         }
         if(actionLabel.equalsIgnoreCase("Swap") && e.getComponent().isEnabled()){
-            System.out.println("Swap was pressed");
             //Swap cards
             handleSwapSkip("Swap");
         }
         
         if(actionLabel.equalsIgnoreCase("Rise") && e.getComponent().isEnabled()){
-            System.out.println("Rise was pressed");
             handleRiseCallFold(BetType.RISE);
             //Place bet if enough money
         }
         
         if(actionLabel.equalsIgnoreCase("Call") && e.getComponent().isEnabled()){
-            System.out.println("Call was pressed");
             handleRiseCallFold(BetType.CALL);
             //Place bet if enough money
         }
         
         if(actionLabel.equalsIgnoreCase("Fold") && e.getComponent().isEnabled()){
-            System.out.println("Fold was pressed");
             handleRiseCallFold(BetType.FOLD);
             //Place bet if enough money
         }

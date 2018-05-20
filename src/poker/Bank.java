@@ -131,6 +131,8 @@ public class Bank {
      */
     public List<Player> getWinner(){
         //Move players who did not FOLD to winning_list and Determine hand type
+        winning_list.clear();
+
         players.forEach(player -> {
             player.getHand().determineHandType();
             if(player.getBetType() != BetType.FOLD){
@@ -376,6 +378,7 @@ public class Bank {
         
     }//loadGame()
 
+    //Sets player BetType to Fold
     void playerFold(PlayerType playerType) {
         this.getPlayerFromWinningList(PlayerType.PLAYER_1).fold();
     }
