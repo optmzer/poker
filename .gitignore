@@ -1,6 +1,10 @@
 # Saved game data
 SavedGame.txt
+derby.log
+derbyclient.jar
+derby.jar
 #Ignore build directory
 build/
 test/
 nbproject/
+PlayersDB/

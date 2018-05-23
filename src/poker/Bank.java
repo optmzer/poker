@@ -17,6 +17,7 @@ import java.util.*;
  * @author Alexander Frolov
  */
 public class Bank {
+    private final String path = "SavedGame.txt";
     //Number of players in  the game
     private final int minimumBet = 2;
     private int pot = 0;
@@ -331,51 +332,14 @@ public class Bank {
      * Only saves player1.
      */
     public void saveGame() {
-        
-        Writer bWriter;
-        try{
-            bWriter = new BufferedWriter(new FileWriter("SavedGame.txt"));
-            for(Player aPlayer: this.players){
-                if(aPlayer.getPlayerType().equals(PlayerType.PLAYER_1)){
-                    bWriter.write(aPlayer.getPlayerType() + " $" + aPlayer.getWallet() + "\n");
-                }
-            }
-            bWriter.close();
-        }catch(IOException e){
-            System.err.println("L298 bank Error writing file => " + e);
-        }
-        System.out.println("L305 bank Game Saved");
+        new Services().saveGame(this.players, this.path);
     }//saveGame()
     
     /**
      * Loads player1 to the game.
      */
     public void loadGame(){
-        Scanner scan;
-        String[] playerEntry;
-        int money = 0;
-        try{
-            //load data from a file
-            scan = new Scanner(new FileReader("SavedGame.txt"));
-
-            //get player ballance
-            if(scan.hasNext()){
-                playerEntry = scan.nextLine().split("\\$");
-                money = Integer.parseInt(playerEntry[1]);
-            }
-            
-            scan.close();
-            //bank getPlayer1
-            this.getPlayer(PlayerType.PLAYER_1).setWallet(money);
-            //show player
-            System.out.println("Player 1 has $" + this.getPlayer(PlayerType.PLAYER_1).getWallet());
-            
-        }catch(IOException | NoSuchElementException e){
-            System.out.println("File not found. Cannot find 'SavedGames.txt' at specified location.");
-            System.out.println("Either file does not exist or was relocated.");
-            System.out.println("Try Save Game first then Load.");
-        }
-        
+        new Services().loadGame(this.getPlayer(PlayerType.PLAYER_1), this.path);
     }//loadGame()
 
     //Sets player BetType to Fold
