@@ -307,7 +307,7 @@ public class Bank {
                         hand.addCard(0, temp_card);
                     }
                 }
-                System.out.println(hand);
+//                System.out.println(hand);
             } 
         });
     }//sortHandByPairs()

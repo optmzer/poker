@@ -186,7 +186,7 @@ public class Services {
         try{
             //                    ================ DB ===================
             money = queryDB(player);
-            //If DB has no entries of player the use file.
+            //If DB has no entries of player then use file.
             if(money == -1){
                 System.out.println("File data used to load");
                 //load data from a file

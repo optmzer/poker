@@ -79,7 +79,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
     }
     
     private void initCardsPanel(){
-        cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 300));
+        Toolkit tKit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = tKit.getScreenSize();
+        int y = screenSize.height / 2 - 70;
+        cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, y));
 //        cardPanel.setBackground(Color.GREEN);
         //init JLabel array
         for(int i = 0; i < 5; ++i){
@@ -196,7 +199,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
 //    ============ SETTERS/GETTERS ===============
     
-       
     private void setBettingValue(int value){
         this.bettingValue = value;
     }
@@ -264,7 +266,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
         
         repaint();
-//        System.out.println("L116 MainViewPanel View Updated");
     }//setPotSize()
     
     public void setComments(String comments){
@@ -320,7 +321,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
     public void setCardLabelBorder(String labelName){
         for(JLabel cardLabel: this.cardLabels){
             if(labelName.equalsIgnoreCase(cardLabel.getName())){
-//                cardLabel.setBorder(BorderFactory.createLineBorder(Color.yellow, 3, true));
                 cardLabel.setEnabled(false);
             }
         }
@@ -329,7 +329,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
     public void removeCardLabelBorder(String labelName){
         for(JLabel cardLabel: this.cardLabels){
             if(labelName.equalsIgnoreCase(cardLabel.getName())){
-//                cardLabel.setBorder(BorderFactory.createLineBorder(Color.green, 0, false));
                 cardLabel.setEnabled(true);
             }
         }
@@ -337,40 +336,29 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
     @Override
      public void paintComponent(Graphics g) {
+        int halfLengthOfHand = 220;
+        Dimension screenSize = this.getBounds().getSize();
+        int x = (int)(screenSize.width / 2 - halfLengthOfHand);
+        int y = 50;
         super.paintComponent(g);       
-//        g.drawString("This is my custom Panel!",10,20);
-//        g.setColor(Color.GREEN); //Sets color of the font to green
             //Player 0 cards shirt up.
             if(showCards){
-                drawCards(player0_hand, 230, 50, g);
-//                drawCards(player1_hand, 200, 350, g);
+                drawCards(player0_hand, x, y, g);
             }else{
-                drawCardShirts(g);
-//                drawCards(player1_hand, 200, 350, g);
+                drawCardShirts(x, y, g);
             }
             //player 1 cards face up
     }  
      
     private void drawCards(Hand hand,int x, int y, Graphics g){
-        
-        System.out.println("Player 1 = " + hand);
         for(Card aCard: hand){
             g.drawImage(aCard.getCardImage(), x, y, this);
             x += 93;
         }
     }
     
-//    private void drawPlayerCards(Hand hand, int x, int y){
-//        for(JLabel label: cardLabels){
-//            label.setLocation(x, y);
-//            x += 93;
-//            this.add(label);
-//        }
-//    }
-     
-    private void drawCardShirts(Graphics g){
-        int player0_x = 230;
-        int player0_y = 50;
+    private void drawCardShirts(int x, int y, Graphics g){
+        
         Image cardShirt = null;
         try {
             cardShirt = ImageIO.read(new File("img\\SHIRT.png"));
@@ -378,8 +366,8 @@ public class MainViewPanel extends JPanel implements ActionListener{
             System.err.println("Cannot find SHIRT.png = " + e.getLocalizedMessage());
         }
         for(Card card: player0_hand){
-            g.drawImage(cardShirt, player0_x, player0_y, this);
-            player0_x += 93;
+            g.drawImage(cardShirt, x, y, this);
+            x += 93;
         }
     } 
     
@@ -387,7 +375,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
         this.showCards = show;
     }
         
-    
     public void updateHand(Player player){
         setHandImages(player.getHand()); //This sets img for Computer hand
         if(player.getPlayerType() == PlayerType.COMPUTER){
@@ -399,8 +386,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }//updatePlayerHand()
      
-   
-    
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("L92 MainViewPanel action registered = " + e.getSource());
@@ -415,6 +400,5 @@ public class MainViewPanel extends JPanel implements ActionListener{
     void enableCardLabels() {
         this.cardLabels.forEach(card -> card.setEnabled(true));
     }
-
        
 }//class

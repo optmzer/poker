@@ -156,10 +156,6 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         showRiseCallFold();
     }
         
-//    public void setBetType(BetType betType){
-//        this.betType = betType;
-//    }
-    
     public void showCards(){
         for(Player player: bank.getPlayers()){
             view.updateHand(player);
@@ -228,10 +224,8 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                     //Make computer bet same as player for now.
                     bank.addToPot(computer.rise(betAmount));
                 }else if(betAmount < minimumBet){
-//                    System.out.println("\n Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
                     view.setComments("Rules of the house. Bet cannot be lower than 2. Bet amount = " + betAmount);
                 }else{
-//                    System.out.println("\n" + player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
                     view.setComments(player1.getPlayerType() + " has not enough funds to bet $" + betAmount);
                 }   
                 
