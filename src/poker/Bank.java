@@ -1,9 +1,5 @@
-/*
- * 
- */
 package poker;
 
-import java.io.*;
 import java.util.*;
 /**
  *  Accept wagers and calculates win also adds wagers to the player's account

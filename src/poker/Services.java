@@ -1,7 +1,3 @@
-/**
- * TODO: If DB does not exists. do not query it.
- */
-
 package poker;
 
 import java.io.BufferedWriter;
@@ -21,6 +17,10 @@ import java.util.logging.Logger;
 /**
  *
  * @author Alexander Frolov
+ * Class contains all method related to Save, Load the game into a file
+ * as well as Read, Write Data Base
+ * Saves Player 1 into file and DB at the same time
+ * Loads Player1 from DB first if fails from File
  */
 public class Services {
     
@@ -32,7 +32,9 @@ public class Services {
     Connection conn;
     
     
-    
+    /**
+     * Establishes connection to JDB
+     */
     private void connectDB(){
         
         try {
@@ -70,11 +72,7 @@ public class Services {
                 statement.executeUpdate(updateTable);
             }
             else {
-                // Table does not exist
-                //When starting for the first time delete previouse table
-                //if exists
                 System.out.println(" Dropping table ");
-//                statement.executeUpdate("CREATE SCHEMA POKER AUTHORIZATION poker ");
                 String sqlCreate = "CREATE TABLE POKER." + tableName + " (ID int NOT NULL,"
                         + "TYPE varchar(20),"
                         + "WALLET int)";
@@ -116,7 +114,6 @@ public class Services {
                 //Get player 1 from the DB
                 String getQuery = "SELECT TYPE, WALLET FROM POKER.PLAYER "
                         + "WHERE ID = 1";
-//                String getQuery = "SELECT * FROM POKER.PLAYER";
                 System.out.println("getQuery = " + getQuery);
                 query = statement.executeQuery(getQuery);
                 query.beforeFirst();

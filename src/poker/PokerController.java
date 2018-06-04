@@ -1,17 +1,10 @@
-/**
- * TODO: Glitch. When folding cards it shows split message
- * and adds double the pot size to computer.
- * Subtract correctly from player 1.
- */
 package poker;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.*;
 
 /**
@@ -113,29 +106,6 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     private void startGame(){
         swapList = new ArrayList<>();
         gameInitScreen();
-                            
-//                            if(BetType.FOLD == this.betType){
-//                                showWinners();
-//                                showPlayersBallance();
-////                                break;
-//                            }
-                            
-//                          3 - trade cards
-//                            showOfferCardSwap();
-                            
-//                          4 - Second round of Betting
-//                            showCards();
-//                            showPlayersBallance();
-                            
-//                            showFoldCallRise(bank, scan);
-                            //In any case after second round of bet
-                            //We need to show winner. No need for if statement
-//                          5 - When betting is over check hands.
-//                            showHands(bank);
-//                            showWinners();
-//                            showPlayersBallance();
-                            
-
     }//startGame()
     
     private void gameInitScreen(){
@@ -162,17 +132,26 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         }
     }//showHands()
     
+    /**
+     * Shows players money/Wallet available for betting
+     */
     private void showPlayersBallance(){
         for(Player player: bank.getPlayers()){
             view.setPlayerWallet(player);
-//            System.out.print("     " + player.getPlayerType() + ": $" + player.getWallet());
         }
     }
     
+    /**
+     * Shows hands face values for comparison at the end of the round
+     * @param b 
+     */
     public void showHands(boolean b){
         view.showCards(b);
     }
     
+    /**
+     * Activates only set of controls necessary to bet
+     */
     private void showRiseCallFold(){
         //get user input 1, 2 or 3
         view.setEnabledSkipSwap(false);
@@ -181,6 +160,10 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         view.setComments("You can Rise, Call or Fold. How much do you want to bet?");
     }//showFoldCallRise()
 
+    /**
+     * Checks if player has enough funds to bet
+     * @param betType 
+     */
     private void showMakeBet(BetType betType){
         int betAmount;
         int minimumBet = 2;
@@ -247,13 +230,17 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
     
     /**
-     * 
+     * Displays text and how many cards you can swap max this time
      * 
      */
     private void showOfferCardSwap(){
         view.setComments("What cards do you want to swap? You can swap up to " + bank.getSwapLimit(PlayerType.PLAYER_1) + " cards");
     }//showOfferCardSwap()
     
+    /**
+     * Gets the winners list from the model - Bank and displays the winner
+     * Times out at 5 seconds so that player can check cards of the opponent
+     */
     private void showWinners(){
         List<Player> winners = bank.getWinner();
                                 
@@ -289,9 +276,11 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
     
 //    ============================== HANDLERS ==============================
-//TODO:
     //They will be switching the screens.
-    
+    /**
+     * Handles selection of the player 1 cards for swapping
+     * @param e 
+     */
     private void handleCardSelect(MouseEvent e){
 
         String cardName = e.getComponent().getName();
@@ -306,21 +295,19 @@ public class PokerController extends JFrame implements ActionListener, MouseList
 //            add to swap list
             this.swapList.add(cardName);
         }
-//        System.out.println("swapList.size() = " + swapList.size());
         //If selected more then allowed remove previouse card
         if(!swapList.isEmpty() && swapList.size() > bank.getSwapLimit(PlayerType.PLAYER_1)){
             int prevCardIndex = bank.getSwapLimit(PlayerType.PLAYER_1) - 1;
             view.removeCardLabelBorder("" + swapList.get(prevCardIndex));
             swapList.remove(bank.getSwapLimit(PlayerType.PLAYER_1) - 1);
-//            System.out.println("Remove prev card " + (prevCardIndex));
         }
-//        this.swapList.forEach((value) -> {
-//            System.out.print(value + ", " );
-//        });
-//        System.out.println("");
-        
     }//handleCardSelect()
     
+    /**
+     * Handles button pushes for Rise/Call/Fold
+     * Determines BetType
+     * @param type 
+     */
     private void handleRiseCallFold(BetType type){
         
         if(BetType.FOLD != type){
@@ -339,6 +326,10 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         secondRound = true;
     }
     
+    /**
+     * Handles swap and skip card swapping button pushes
+     * @param action 
+     */
     private void handleSwapSkip(String action){
         List<Integer> cardIndexes = new ArrayList<>();
         
@@ -370,6 +361,10 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
 //    ============================== ACTIONS ==============================
         
+    /**
+     * Actions for file drop down menu
+     * @param e 
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
 //        System.out.println("Event = " + e);
@@ -402,9 +397,15 @@ public class PokerController extends JFrame implements ActionListener, MouseList
     
     //Mouse Actions
 
+    /**
+     * Mouse click handler of the main view
+     * Card selection, button push and slider movements
+     * @param e 
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
         String card = e.getComponent().getName();
+        // ========== Card selection
         //If swap !isEnabled() do not register clicks
         if(!view.getSwapLabel().isEnabled()){
             
@@ -429,8 +430,7 @@ public class PokerController extends JFrame implements ActionListener, MouseList
                 break;
         }
         
-//        System.out.println("Event = " + e.getComponent().isEnabled());
-        
+        // ========== Button Pushes
         String actionLabel = e.getComponent().getName();
         if(actionLabel.equalsIgnoreCase("Skip") && e.getComponent().isEnabled()){
             //Skip cards swap or betting 
@@ -457,18 +457,34 @@ public class PokerController extends JFrame implements ActionListener, MouseList
         }
     }//mouseClicked()
 
+    /**
+     * Reserved for future use
+     * @param e 
+     */
     @Override
     public void mousePressed(MouseEvent e) {
     }
 
+    /**
+     * Reserved for future use
+     * @param e 
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
     }
 
+    /**
+     * Reserved for future use
+     * @param e 
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
     }
-
+    
+    /**
+     * Reserved for future use
+     * @param e 
+     */
     @Override
     public void mouseExited(MouseEvent e) {
     }

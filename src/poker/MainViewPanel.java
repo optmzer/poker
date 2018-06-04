@@ -1,13 +1,6 @@
-/**
- * Attache listener to the cards 
- * Make the controller
- * Add File menu with save load
- * Add label to show the bet.
- */
 package poker;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +16,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author Alexander Frolov
  */
-public class MainViewPanel extends JPanel implements ActionListener{
+public class MainViewPanel extends JPanel{
     
     private final String imgURL = "img\\";
     private List<Player> players;
@@ -102,7 +95,6 @@ public class MainViewPanel extends JPanel implements ActionListener{
     
     private void initMoneyPanel(){
         moneyPanel = new JPanel(new GridLayout(0, 1));
-//        moneyPanel.setPreferredSize(new Dimension(150, this.getHeight()));
         moneyPanel.setBackground(Color.GREEN);
 
         potSize = new JLabel();
@@ -221,6 +213,9 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }
     
+    /**
+     * Sets label images with player 1 cards faces
+     */
     private void setLabelImages(){
         for(int i = 0; i < player1_hand.size(); ++i){
             try {
@@ -233,6 +228,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }
     
+    /**
+     * Sets list of players and their wallets for view to render
+     * @param players 
+     */
     public void setPlayers(List<Player> players){
 //       initBettingPanel();
        this.players = players;
@@ -241,6 +240,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
        }
     }
     
+    /**
+     * Sets wallet of a player
+     * @param player 
+     */
     public void setPlayerWallet(Player player){
         if(player.getPlayerType() == PlayerType.COMPUTER){
             p0_wallet.setText("     Kelly $ " + player.getWallet());
@@ -250,6 +253,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }
     
+    /**
+     * Sets pot size of the round
+     * @param pot 
+     */
     public void setPotSize(int pot){
         this.potSize.setText("     Pot $ " + pot);
     }
@@ -268,56 +275,102 @@ public class MainViewPanel extends JPanel implements ActionListener{
         repaint();
     }//setPotSize()
     
+    /**
+     * Sets comments on top of the screen to navigate players through the game
+     * @param comments 
+     */
     public void setComments(String comments){
         this.comments.setText(comments);
         repaint();
     }
     
+    /**
+     * Get swap label to attach listener to
+     * @return 
+     */
     public JLabel getSwapLabel(){
         return this.swap;
     }
-    
+    /**
+     * Get skip label to attach listener to
+     * @return 
+     */
     public JLabel getSkipLabel(){
         return this.skip;
     }
     
+    /**
+     * Get rise label to attach listener to
+     * @return 
+     */
     public JLabel getRiseLabel(){
         return this.rise;
     }
     
+    /**
+     * Get call label to attach listener to
+     * @return 
+     */
     public JLabel getCallLabel(){
         return this.call;
     }
     
+    /**
+     * Get fold label to attach listener to
+     * @return 
+     */
     public JLabel getFoldLabel(){
         return this.fold;
     }
     
+    /**
+     * Sets control labels enabled
+     * @param b 
+     */
     public void setEnabledRiseFoldCall(boolean b){
         this.rise.setEnabled(b);
         this.call.setEnabled(b);
         this.fold.setEnabled(b);
     }
     
+    /**
+     * Sets control labels enabled
+     * @param b 
+     */
     public void setEnabledSkipSwap(boolean b) {
         this.skip.setEnabled(b);
         this.swap.setEnabled(b);
     }
     
+    /**
+     * Enables betting slider
+     * @param b 
+     */
     public void setEnabledSlider(boolean b){
         this.bettingSlider.setEnabled(b);
     }
     
+    /**
+     * Disables controls when they are not in use
+     */
     public void disableControls(){
         this.setEnabledRiseFoldCall(false);
         this.setEnabledSkipSwap(false);
         this.setEnabledSlider(false);
     }
     
+    /**
+     * Returns list of card labels from the View
+     * @return 
+     */
     public List<JLabel> getCardLabels(){
         return this.cardLabels;
     }
     
+    /**
+     * Selects/Highlights selected cards for swapping
+     * @param labelName 
+     */
     public void setCardLabelBorder(String labelName){
         for(JLabel cardLabel: this.cardLabels){
             if(labelName.equalsIgnoreCase(cardLabel.getName())){
@@ -326,6 +379,10 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }//setCardLableBorder()
     
+    /**
+     * Deselects selected cards for swapping
+     * @param labelName 
+     */
     public void removeCardLabelBorder(String labelName){
         for(JLabel cardLabel: this.cardLabels){
             if(labelName.equalsIgnoreCase(cardLabel.getName())){
@@ -349,7 +406,13 @@ public class MainViewPanel extends JPanel implements ActionListener{
             }
             //player 1 cards face up
     }  
-     
+    /**
+     * Draws card shirts of player 0
+     * @param hand
+     * @param x
+     * @param y
+     * @param g 
+     */
     private void drawCards(Hand hand,int x, int y, Graphics g){
         for(Card aCard: hand){
             g.drawImage(aCard.getCardImage(), x, y, this);
@@ -357,6 +420,12 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }
     
+    /**
+     * Draws card shirts of player 1
+     * @param x
+     * @param y
+     * @param g 
+     */
     private void drawCardShirts(int x, int y, Graphics g){
         
         Image cardShirt = null;
@@ -371,10 +440,18 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     } 
     
+    /**
+     * Exposes all card face values in the end of each round
+     * @param show 
+     */
     public void showCards(boolean show){
         this.showCards = show;
     }
         
+    /**
+     * Update hand after swap or dial of new cards
+     * @param player 
+     */
     public void updateHand(Player player){
         setHandImages(player.getHand()); //This sets img for Computer hand
         if(player.getPlayerType() == PlayerType.COMPUTER){
@@ -386,17 +463,17 @@ public class MainViewPanel extends JPanel implements ActionListener{
         }
     }//updatePlayerHand()
      
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("L92 MainViewPanel action registered = " + e.getSource());
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    /**
+     * Resets slider after each use to minimal allowed value of 2
+     */
     void resetSlider() {
         this.bettingSlider.setValue(2);
         setBettingValue(2);
     }
 
+    /**
+     * Enables all card labels
+     */
     void enableCardLabels() {
         this.cardLabels.forEach(card -> card.setEnabled(true));
     }
